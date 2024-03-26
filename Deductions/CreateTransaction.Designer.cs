@@ -32,8 +32,8 @@
             TransactionValueLabel = new Label();
             TransactionValueTextBox = new TextBox();
             investmentComboBox = new ComboBox();
-            TransactionNameLabel = new Label();
-            TransactionNameTextBox = new TextBox();
+            categoryLabel = new Label();
+            categoryTextBox = new TextBox();
             InvestmentLabel = new Label();
             TransactionTypeLabel = new Label();
             TransactionTypeComboBox = new ComboBox();
@@ -69,27 +69,28 @@
             // 
             // investmentComboBox
             // 
+            investmentComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             investmentComboBox.FormattingEnabled = true;
             investmentComboBox.Location = new Point(83, 79);
             investmentComboBox.Name = "investmentComboBox";
             investmentComboBox.Size = new Size(272, 23);
             investmentComboBox.TabIndex = 14;
             // 
-            // TransactionNameLabel
+            // categoryLabel
             // 
-            TransactionNameLabel.AutoSize = true;
-            TransactionNameLabel.Location = new Point(83, 126);
-            TransactionNameLabel.Name = "TransactionNameLabel";
-            TransactionNameLabel.Size = new Size(184, 15);
-            TransactionNameLabel.TabIndex = 13;
-            TransactionNameLabel.Text = "Enter a name for your Transaction";
+            categoryLabel.AutoSize = true;
+            categoryLabel.Location = new Point(83, 126);
+            categoryLabel.Name = "categoryLabel";
+            categoryLabel.Size = new Size(184, 15);
+            categoryLabel.TabIndex = 13;
+            categoryLabel.Text = "Enter a name for your Transaction";
             // 
-            // TransactionNameTextBox
+            // categoryTextBox
             // 
-            TransactionNameTextBox.Location = new Point(83, 158);
-            TransactionNameTextBox.Name = "TransactionNameTextBox";
-            TransactionNameTextBox.Size = new Size(272, 23);
-            TransactionNameTextBox.TabIndex = 12;
+            categoryTextBox.Location = new Point(83, 158);
+            categoryTextBox.Name = "categoryTextBox";
+            categoryTextBox.Size = new Size(272, 23);
+            categoryTextBox.TabIndex = 12;
             // 
             // InvestmentLabel
             // 
@@ -111,6 +112,7 @@
             // 
             // TransactionTypeComboBox
             // 
+            TransactionTypeComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             TransactionTypeComboBox.FormattingEnabled = true;
             TransactionTypeComboBox.Location = new Point(83, 289);
             TransactionTypeComboBox.Name = "TransactionTypeComboBox";
@@ -143,8 +145,8 @@
             Controls.Add(TransactionTypeComboBox);
             Controls.Add(TransactionTypeLabel);
             Controls.Add(investmentComboBox);
-            Controls.Add(TransactionNameLabel);
-            Controls.Add(TransactionNameTextBox);
+            Controls.Add(categoryLabel);
+            Controls.Add(categoryTextBox);
             Controls.Add(InvestmentLabel);
             Controls.Add(TransactionValueLabel);
             Controls.Add(TransactionValueTextBox);
@@ -162,8 +164,8 @@
         private Label TransactionValueLabel;
         private TextBox TransactionValueTextBox;
         private ComboBox investmentComboBox;
-        private Label TransactionNameLabel;
-        private TextBox TransactionNameTextBox;
+        private Label categoryLabel;
+        private TextBox categoryTextBox;
         private Label InvestmentLabel;
         private Label TransactionTypeLabel;
         private ComboBox TransactionTypeComboBox;

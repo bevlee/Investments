@@ -4,8 +4,6 @@ namespace Deductions
 {
     internal class Database
     {
-         
-
         public static SQLiteConnection CreateConnection()
         {
             string appDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Deductions");
@@ -94,7 +92,7 @@ namespace Deductions
                     System.Diagnostics.Debug.WriteLine($" fy is not set");
                     command.CommandText =
                    @"
-                    SELECT TransactionName, Date, Value, TransactionType
+                    SELECT Category, Date, Value, TransactionType
                     FROM Transactions
                     WHERE InvestmentName = @investmentName;
                     ";
@@ -103,7 +101,7 @@ namespace Deductions
                     System.Diagnostics.Debug.WriteLine($" fy is  set to {fy}");
                     command.CommandText =
                    @"
-                    SELECT TransactionName, Date, Value, TransactionType
+                    SELECT Category, Date, Value, TransactionType
                     FROM Transactions
                     WHERE InvestmentName = @investmentName
                     AND FinancialYear = @financialYear;
@@ -120,12 +118,12 @@ namespace Deductions
                     while (reader.Read())
                     {
 
-                        string transactionName = reader.GetString(0);
+                        string Category = reader.GetString(0);
                         DateTime date = UnixTimeStampToDateTime((int) reader.GetInt32(1));
                         double value = reader.GetDouble(2);
                         string transactionType = reader.GetString(3);
 
-                        transaction = new Transaction(transactionName, date, value, transactionType, ToFinancialYear(date), investmentName);
+                        transaction = new Transaction(Category, date, value, transactionType, ToFinancialYear(date), investmentName);
                         transactions.Add(transaction);
 
                     }
@@ -192,12 +190,12 @@ namespace Deductions
                 var createCommand = conn.CreateCommand();
                 createCommand.CommandText =
                     @"
-                        INSERT INTO Transactions (TransactionName, InvestmentName, Value, Date, TransactionType, FinancialYear)
-                        VALUES (@transactionName, @investmentName, @value, @Date, @transactionType, @FinancialYear);
+                        INSERT INTO Transactions (Category, InvestmentName, Value, Date, TransactionType, FinancialYear)
+                        VALUES (@Category, @investmentName, @value, @Date, @transactionType, @FinancialYear);
                     ";
-                createCommand.Parameters.AddWithValue("@transactionName", transaction.transactionName);
+                createCommand.Parameters.AddWithValue("@Category", transaction.category);
                 createCommand.Parameters.AddWithValue("@investmentName", transaction.investmentName);
-                createCommand.Parameters.AddWithValue("@value", transaction.value);
+                createCommand.Parameters.AddWithValue("@value", transaction.amount);
                 createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.date).ToUnixTimeSeconds());
                 createCommand.Parameters.AddWithValue("@transactionType", transaction.TransactionType);
                 createCommand.Parameters.AddWithValue("@FinancialYear", ToFinancialYear(transaction.date));
@@ -230,15 +228,15 @@ namespace Deductions
                     createCommand.CommandText =
                     @"
                         DELETE FROM Transactions 
-                        WHERE TransactionName = @transactionName
+                        WHERE Category = @Category
                         AND InvestmentName = @investmentName
                         AND Value = @value
                         AND Date = @Date
                         AND TransactionType = @transactionType;
                     ";
-                    createCommand.Parameters.AddWithValue("@transactionName", transaction.transactionName);
+                    createCommand.Parameters.AddWithValue("@Category", transaction.category);
                     createCommand.Parameters.AddWithValue("@investmentName", transaction.investmentName);
-                    createCommand.Parameters.AddWithValue("@value", transaction.value);
+                    createCommand.Parameters.AddWithValue("@value", transaction.amount);
                     createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.date).ToUnixTimeSeconds());
                     createCommand.Parameters.AddWithValue("@transactionType", transaction.TransactionType);
                     createCommand.Parameters.AddWithValue("@FinancialYear", ToFinancialYear(transaction.date));

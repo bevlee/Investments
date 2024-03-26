@@ -72,6 +72,7 @@
             // 
             // accountComboBox
             // 
+            accountComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             accountComboBox.FormattingEnabled = true;
             accountComboBox.Location = new Point(179, 194);
             accountComboBox.Name = "accountComboBox";

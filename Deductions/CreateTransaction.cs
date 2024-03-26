@@ -14,7 +14,7 @@
             investmentComboBox.DataSource = investments;
             investmentComboBox.SelectedItem = investmentName;
 
-            string[] transactionTypes = ["Income", "Expense", "Depreciation/Capital Expense"];
+            string[] transactionTypes = ["Income", "Expense"];
             TransactionTypeComboBox.DataSource = transactionTypes;
         }
         private void createTransactionButton_Click(object sender, EventArgs e)
@@ -32,15 +32,15 @@
 
                 TransactionTypeComboBox.BackColor = Color.White;
             }
-            if (TransactionNameTextBox.Text.Length == 0)
+            if (categoryTextBox.Text.Length == 0)
             {
                 valid = false;
-                TransactionNameTextBox.BackColor = Color.Red;
+                categoryTextBox.BackColor = Color.Red;
             }
             else
             {
 
-                TransactionNameTextBox.BackColor = Color.White;
+                categoryTextBox.BackColor = Color.White;
             }
             if (Double.TryParse(TransactionValueTextBox.Text, out value))
             {
@@ -53,7 +53,7 @@
             }
             if (valid)
             {
-                string name = TransactionNameTextBox.Text;
+                string name = categoryTextBox.Text;
                 DateTime date = ((DateTimeOffset)TransactionDatePicker.Value).UtcDateTime;
                 int fy = ToFinancialYear(TransactionDatePicker.Value);
                 Database.CreateNewTransaction(new Transaction(name, date, value, TransactionTypeComboBox.Text, 24, investmentComboBox.Text));

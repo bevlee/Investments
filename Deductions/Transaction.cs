@@ -3,23 +3,23 @@
     internal class Transaction
     {
         public String TransactionType { get; }
-        public String transactionName { get; }
+        public String category { get; }
         public DateTime date { get; }
-        public Double value { get; set; }
+        public Double amount { get; set; }
         public int financialYear { get; }
         public String investmentName { get; }
 
-        public Transaction(String transactionName,
+        public Transaction(String category,
                             DateTime date,
-                            Double value,
+                            Double amount,
                             String TransactionType,
                             int financialYear,
                             String investmentName)
         {
-            this.transactionName = transactionName;
+            this.category = category;
             this.TransactionType = TransactionType;
             this.date = date;
-            this.value = value;
+            this.amount = amount;
             this.financialYear = financialYear;
             this.investmentName = investmentName;
         }

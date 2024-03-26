@@ -97,7 +97,7 @@ namespace Deductions
                     @"
                         CREATE TABLE Transactions (
                         TransactionId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                        TransactionName TEXT NOT NULL,
+                        Category TEXT NOT NULL,
                         Date INTEGER NOT NULL,
                         Value REAL NOT NULL,
                         TransactionType TEXT NOT NULL,
@@ -127,7 +127,7 @@ namespace Deductions
                     // create dummy transactions
                     command.CommandText =
                     @"
-                        INSERT INTO Transactions (TransactionName, InvestmentName, Value, Date, TransactionType, FinancialYear)
+                        INSERT INTO Transactions (category, InvestmentName, Value, Date, TransactionType, FinancialYear)
                         VALUES 
                             ('Jan rent', 'Test', 1500, 1706679357, 'Income', '2024'),
                             ('Feb rent', 'Test', 1500, 1709184957, 'Income', '2024'),
@@ -186,12 +186,12 @@ namespace Deductions
                 foreach (DataGridViewRow row in TransactionDataGridView.SelectedRows)
                 {
                     string transactionType = row.Cells[0].Value.ToString();
-                    string transactionName = row.Cells[1].Value.ToString();
+                    string category = row.Cells[1].Value.ToString();
                     DateTime date = ((DateTimeOffset)DateTime.Parse(row.Cells[2].Value.ToString())).UtcDateTime;
                     double value = Double.Parse(row.Cells[3].Value.ToString());
                     int financialYear = int.Parse(row.Cells[4].Value.ToString());
                     string investmentName = row.Cells[5].Value.ToString();
-                    transactionList.Add(new Transaction(transactionName, date, value, transactionType, financialYear, investmentName));
+                    transactionList.Add(new Transaction(category, date, value, transactionType, financialYear, investmentName));
 
                 }
                 Database.DeleteTransactions(transactionList);
@@ -203,17 +203,10 @@ namespace Deductions
             System.Diagnostics.Debug.WriteLine($" displaying transactions!");
             List<Transaction> allTransactions = Database.LoadTransactions(investmentName, financialYearString);
             double netValue = 0;
-            double netDepreciation = 0;
             allTransactions.ForEach(transaction =>
             {
-                if (transaction.TransactionType == "Depreciation/Capital Expense")
-                {
-                    netDepreciation += transaction.value;
-                }
-                else
-                {
-                    netValue += transaction.TransactionType == "Income" ? transaction.value : -transaction.value;
-                }
+                netValue += transaction.TransactionType == "Income" ? transaction.amount : -transaction.amount;
+                
             });
 
             TransactionDataGridView.DataSource = allTransactions;
@@ -233,7 +226,7 @@ namespace Deductions
                 System.Diagnostics.Debug.WriteLine($" new fy is {financialYearString}!");
                 loadNewDates = false;
             }
-            NetValueLabel.Text = $"The net value for investment {investmentName} is {netValue}. The net depreciation is {netDepreciation}";
+            NetValueLabel.Text = $"The net value for investment {investmentName} is {netValue}";
         }
 
         private void createInvestmentButton_Click(object sender, EventArgs e)

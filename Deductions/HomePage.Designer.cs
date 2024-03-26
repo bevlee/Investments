@@ -74,6 +74,7 @@ namespace Deductions
             // 
             // accountComboBox
             // 
+            accountComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             accountComboBox.FormattingEnabled = true;
             accountComboBox.Location = new Point(17, 47);
             accountComboBox.Name = "accountComboBox";
@@ -82,6 +83,7 @@ namespace Deductions
             // 
             // investmentComboBox
             // 
+            investmentComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             investmentComboBox.FormattingEnabled = true;
             investmentComboBox.Location = new Point(159, 47);
             investmentComboBox.Name = "investmentComboBox";
@@ -148,6 +150,7 @@ namespace Deductions
             // 
             // FinancialYearComboBox
             // 
+            FinancialYearComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             FinancialYearComboBox.FormattingEnabled = true;
             FinancialYearComboBox.Location = new Point(709, 47);
             FinancialYearComboBox.Name = "FinancialYearComboBox";
