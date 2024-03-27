@@ -60,15 +60,16 @@ namespace Deductions
                 foreach (string item in expectedTables)
                 {
                     if (tables.Contains(item))
-                    { 
-                        tablesPresent = true; 
-                    } else
+                    {
+                        tablesPresent = true;
+                    }
+                    else
                     {
                         tablesPresent = false;
                         break;
                     }
                 }
-                
+
                 //create the tables if they dont exist
                 if (!tablesPresent)
                 {
@@ -91,7 +92,7 @@ namespace Deductions
                         );
                     ";
                     command.ExecuteNonQuery();
-                    
+
                     // create the Transactions table
                     command.CommandText =
                     @"
@@ -129,10 +130,12 @@ namespace Deductions
                     @"
                         INSERT INTO Transactions (category, InvestmentName, Value, Date, TransactionType, FinancialYear)
                         VALUES 
-                            ('Jan rent', 'Test', 1500, 1706679357, 'Income', '2024'),
-                            ('Feb rent', 'Test', 1500, 1709184957, 'Income', '2024'),
+                            ('Rent', 'Test', 1500, 1706679357, 'Income', '2024'),
+                            ('Rent', 'Test', 1500, 1709184957, 'Income', '2024'),
                             ('Cleaning Costs', 'Test', 950, 1707973200, 'Expense', '2024'),
-                            ('2024 Depreciation', 'Test', 4589.23, 1707973200, 'Depreciation/Capital Expense', '2024');
+                            ('Water', 'Test', 459.23, 1707973200, 'Expense', '2024');
+                            ('Gas', 'Test', 459.23, 1707973200, 'Expense', '2024');
+                            ('Electricity', 'Test', 459.23, 1707973200, 'Expense', '2024');
                     ";
                     command.ExecuteNonQuery();
                 }
@@ -172,10 +175,6 @@ namespace Deductions
             DisplayTransactions();
         }
 
-        private void HomePage_Load(object sender, EventArgs e)
-        {
-
-        }
         private void DeleteTransactions(object sender, EventArgs e)
         {
 
@@ -206,7 +205,7 @@ namespace Deductions
             allTransactions.ForEach(transaction =>
             {
                 netValue += transaction.TransactionType == "Income" ? transaction.amount : -transaction.amount;
-                
+
             });
 
             TransactionDataGridView.DataSource = allTransactions;
@@ -293,6 +292,24 @@ namespace Deductions
             return ascending ?
                 list.OrderBy(_ => _.GetType().GetProperty(column).GetValue(_)).ToList() :
                 list.OrderByDescending(_ => _.GetType().GetProperty(column).GetValue(_)).ToList();
+        }
+
+        private void createIncomeButton_Click(object sender, EventArgs e)
+        {
+            CreateTransaction createTransactionForm = new CreateTransaction(investmentName, "Income");
+            if (createTransactionForm.ShowDialog() == DialogResult.OK)
+            {
+                LoadData();
+            }
+        }
+
+        private void createExpenseButton_Click(object sender, EventArgs e)
+        {
+            CreateTransaction createTransactionForm = new CreateTransaction(investmentName, "Expense");
+            if (createTransactionForm.ShowDialog() == DialogResult.OK)
+            {
+                LoadData();
+            }
         }
     }
 }

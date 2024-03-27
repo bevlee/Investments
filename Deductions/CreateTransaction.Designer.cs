@@ -46,7 +46,7 @@
             createTransactionButton.Location = new Point(168, 418);
             createTransactionButton.Name = "createTransactionButton";
             createTransactionButton.Size = new Size(75, 23);
-            createTransactionButton.TabIndex = 0;
+            createTransactionButton.TabIndex = 5;
             createTransactionButton.Text = "Create";
             createTransactionButton.UseVisualStyleBackColor = true;
             createTransactionButton.Click += createTransactionButton_Click;
@@ -65,7 +65,7 @@
             TransactionValueTextBox.Location = new Point(83, 225);
             TransactionValueTextBox.Name = "TransactionValueTextBox";
             TransactionValueTextBox.Size = new Size(272, 23);
-            TransactionValueTextBox.TabIndex = 8;
+            TransactionValueTextBox.TabIndex = 2;
             // 
             // investmentComboBox
             // 
@@ -74,7 +74,7 @@
             investmentComboBox.Location = new Point(83, 79);
             investmentComboBox.Name = "investmentComboBox";
             investmentComboBox.Size = new Size(272, 23);
-            investmentComboBox.TabIndex = 14;
+            investmentComboBox.TabIndex = 0;
             // 
             // categoryLabel
             // 
@@ -90,7 +90,7 @@
             categoryTextBox.Location = new Point(83, 158);
             categoryTextBox.Name = "categoryTextBox";
             categoryTextBox.Size = new Size(272, 23);
-            categoryTextBox.TabIndex = 12;
+            categoryTextBox.TabIndex = 1;
             // 
             // InvestmentLabel
             // 
@@ -117,7 +117,7 @@
             TransactionTypeComboBox.Location = new Point(83, 289);
             TransactionTypeComboBox.Name = "TransactionTypeComboBox";
             TransactionTypeComboBox.Size = new Size(272, 23);
-            TransactionTypeComboBox.TabIndex = 17;
+            TransactionTypeComboBox.TabIndex = 3;
             // 
             // TransactionDateLabel
             // 
@@ -133,7 +133,7 @@
             TransactionDatePicker.Location = new Point(83, 353);
             TransactionDatePicker.Name = "TransactionDatePicker";
             TransactionDatePicker.Size = new Size(272, 23);
-            TransactionDatePicker.TabIndex = 19;
+            TransactionDatePicker.TabIndex = 4;
             // 
             // CreateTransaction
             // 

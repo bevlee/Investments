@@ -48,6 +48,8 @@ namespace Deductions
             FinancialYearComboBox = new ComboBox();
             NetValueLabel = new Label();
             DeleteButton = new Button();
+            createIncomeButton = new Button();
+            createExpenseButton = new Button();
             ((System.ComponentModel.ISupportInitialize)TransactionDataGridView).BeginInit();
             SuspendLayout();
             // 
@@ -66,7 +68,7 @@ namespace Deductions
             createInvestmentButton.BackColor = Color.GreenYellow;
             createInvestmentButton.Location = new Point(159, 76);
             createInvestmentButton.Name = "createInvestmentButton";
-            createInvestmentButton.Size = new Size(121, 23);
+            createInvestmentButton.Size = new Size(121, 24);
             createInvestmentButton.TabIndex = 2;
             createInvestmentButton.Text = "Create Investment";
             createInvestmentButton.UseVisualStyleBackColor = false;
@@ -107,7 +109,7 @@ namespace Deductions
             createAccountButton.BackgroundImageLayout = ImageLayout.None;
             createAccountButton.Location = new Point(17, 76);
             createAccountButton.Name = "createAccountButton";
-            createAccountButton.Size = new Size(121, 23);
+            createAccountButton.Size = new Size(121, 24);
             createAccountButton.TabIndex = 6;
             createAccountButton.Text = "Create Account";
             createAccountButton.UseVisualStyleBackColor = false;
@@ -119,20 +121,19 @@ namespace Deductions
             TransactionDataGridView.AllowUserToOrderColumns = true;
             TransactionDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             TransactionDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            TransactionDataGridView.Location = new Point(40, 235);
+            TransactionDataGridView.Location = new Point(17, 115);
             TransactionDataGridView.Name = "TransactionDataGridView";
             TransactionDataGridView.ReadOnly = true;
-            TransactionDataGridView.Size = new Size(1070, 585);
+            TransactionDataGridView.Size = new Size(1052, 382);
             TransactionDataGridView.TabIndex = 7;
             TransactionDataGridView.ColumnHeaderMouseClick += TransactionDataGridView_ColumnHeaderMouseClick;
             // 
             // createTransactionButton
             // 
-            createTransactionButton.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            createTransactionButton.BackColor = Color.GreenYellow;
-            createTransactionButton.Location = new Point(989, 860);
+            createTransactionButton.BackColor = Color.PaleGoldenrod;
+            createTransactionButton.Location = new Point(1130, 340);
             createTransactionButton.Name = "createTransactionButton";
-            createTransactionButton.Size = new Size(121, 23);
+            createTransactionButton.Size = new Size(141, 40);
             createTransactionButton.TabIndex = 8;
             createTransactionButton.Text = "Create Transaction";
             createTransactionButton.UseVisualStyleBackColor = false;
@@ -161,28 +162,52 @@ namespace Deductions
             // NetValueLabel
             // 
             NetValueLabel.AutoSize = true;
-            NetValueLabel.Location = new Point(43, 833);
+            NetValueLabel.Location = new Point(33, 514);
             NetValueLabel.Name = "NetValueLabel";
-            NetValueLabel.Size = new Size(0, 15);
+            NetValueLabel.Size = new Size(58, 15);
             NetValueLabel.TabIndex = 11;
+            NetValueLabel.Text = "Summary";
             // 
             // DeleteButton
             // 
-            DeleteButton.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             DeleteButton.BackColor = Color.DarkKhaki;
-            DeleteButton.Location = new Point(709, 860);
+            DeleteButton.Location = new Point(1093, 115);
             DeleteButton.Name = "DeleteButton";
-            DeleteButton.Size = new Size(198, 23);
+            DeleteButton.Size = new Size(178, 24);
             DeleteButton.TabIndex = 12;
             DeleteButton.Text = "Deleted Selected Rows";
             DeleteButton.UseVisualStyleBackColor = false;
             DeleteButton.Click += DeleteTransactions;
             // 
+            // createIncomeButton
+            // 
+            createIncomeButton.BackColor = Color.YellowGreen;
+            createIncomeButton.Location = new Point(1130, 386);
+            createIncomeButton.Name = "createIncomeButton";
+            createIncomeButton.Size = new Size(141, 40);
+            createIncomeButton.TabIndex = 13;
+            createIncomeButton.Text = "Create Income";
+            createIncomeButton.UseVisualStyleBackColor = false;
+            createIncomeButton.Click += createIncomeButton_Click;
+            // 
+            // createExpenseButton
+            // 
+            createExpenseButton.BackColor = Color.Red;
+            createExpenseButton.Location = new Point(1130, 430);
+            createExpenseButton.Name = "createExpenseButton";
+            createExpenseButton.Size = new Size(141, 40);
+            createExpenseButton.TabIndex = 14;
+            createExpenseButton.Text = "Create Expense";
+            createExpenseButton.UseVisualStyleBackColor = false;
+            createExpenseButton.Click += createExpenseButton_Click;
+            // 
             // HomePage
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1363, 923);
+            ClientSize = new Size(1300, 601);
+            Controls.Add(createExpenseButton);
+            Controls.Add(createIncomeButton);
             Controls.Add(DeleteButton);
             Controls.Add(NetValueLabel);
             Controls.Add(FinancialYearComboBox);
@@ -198,7 +223,6 @@ namespace Deductions
             Name = "HomePage";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "InvestmentManager";
-            Load += HomePage_Load;
             ((System.ComponentModel.ISupportInitialize)TransactionDataGridView).EndInit();
             ResumeLayout(false);
             PerformLayout();
@@ -217,5 +241,7 @@ namespace Deductions
         private ComboBox FinancialYearComboBox;
         private Label NetValueLabel;
         private Button DeleteButton;
+        private Button createIncomeButton;
+        private Button createExpenseButton;
     }
 }

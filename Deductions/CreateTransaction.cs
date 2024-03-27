@@ -7,6 +7,12 @@
             InitializeComponent();
             LoadData(investmentName);
         }
+
+        public CreateTransaction(string investmentName, string investmentType)
+        {
+            InitializeComponent();
+            LoadData(investmentName, investmentType);
+        }
         private void LoadData(string investmentName)
         {
 
@@ -16,6 +22,18 @@
 
             string[] transactionTypes = ["Income", "Expense"];
             TransactionTypeComboBox.DataSource = transactionTypes;
+        }
+
+        private void LoadData(string investmentName, string investmentType)
+        {
+
+            List<string> investments = Database.getAllInvestments();
+            investmentComboBox.DataSource = investments;
+            investmentComboBox.SelectedItem = investmentName;
+
+            string[] transactionTypes = ["Income", "Expense"];
+            TransactionTypeComboBox.DataSource = transactionTypes;
+            TransactionTypeComboBox.SelectedItem = investmentType;
         }
         private void createTransactionButton_Click(object sender, EventArgs e)
         {
