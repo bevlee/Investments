@@ -1,4 +1,6 @@
 using System.Data.SQLite;
+using System.IO;
+using LumenWorks.Framework.IO.Csv;
 namespace Deductions
 {
     public partial class HomePage : Form
@@ -55,20 +57,8 @@ namespace Deductions
                         tables.Add(tableName);
                     }
                 }
-                string[] expectedTables = ["Transactions, Accounts, Investments"];
-                bool tablesPresent = false;
-                foreach (string item in expectedTables)
-                {
-                    if (tables.Contains(item))
-                    {
-                        tablesPresent = true;
-                    }
-                    else
-                    {
-                        tablesPresent = false;
-                        break;
-                    }
-                }
+                string[] expectedTables = ["Transactions", "Accounts", "Investments", "Sources"];
+                bool tablesPresent = tables.All(expectedTables.Contains);
 
                 //create the tables if they dont exist
                 if (!tablesPresent)
@@ -97,14 +87,27 @@ namespace Deductions
                     command.CommandText =
                     @"
                         CREATE TABLE Transactions (
-                        TransactionId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                         Category TEXT NOT NULL,
                         Date INTEGER NOT NULL,
+                        LastModifiedDate INTEGER NOT NULL,
                         Value REAL NOT NULL,
                         TransactionType TEXT NOT NULL,
                         FinancialYear INTEGER NOT NULL,
                         InvestmentName TEXT NOT NULL,
+                        Notes TEXT,
+                        SourceId INTEGER,
+                        PRIMARY KEY (Category, Date, Value, TransactionType, InvestmentName),
+                        FOREIGN KEY (SourceId) REFERENCES Sources (SourceId),
                         FOREIGN KEY (InvestmentName) REFERENCES Investments (InvestmentName)
+                        );
+                    ";
+                    command.ExecuteNonQuery();
+
+                    // create the Sources table
+                    command.CommandText =
+                    @"
+                        CREATE TABLE Sources (
+                        SourceId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL
                         );
                     ";
                     command.ExecuteNonQuery();
@@ -128,15 +131,16 @@ namespace Deductions
                     // create dummy transactions
                     command.CommandText =
                     @"
-                        INSERT INTO Transactions (category, InvestmentName, Value, Date, TransactionType, FinancialYear)
+                        INSERT INTO Transactions (Category, InvestmentName, Value, Date, LastModifiedDate, Notes, TransactionType, FinancialYear, SourceId)
                         VALUES 
-                            ('Rent', 'Test', 1500, 1706679357, 'Income', '2024'),
-                            ('Rent', 'Test', 1500, 1709184957, 'Income', '2024'),
-                            ('Cleaning Costs', 'Test', 950, 1707973200, 'Expense', '2024'),
-                            ('Water', 'Test', 459.23, 1707973200, 'Expense', '2024');
-                            ('Gas', 'Test', 459.23, 1707973200, 'Expense', '2024');
-                            ('Electricity', 'Test', 459.23, 1707973200, 'Expense', '2024');
+                            ('Rent', 'Test', 1500, 1706679357, $currentDate, '', 'Income', '2024', ''),
+                            ('Rent', 'Test', 1500, 1709184957, $currentDate, '', 'Income', '2024', ''),
+                            ('Cleaning Costs', 'Test', 950, 1707973200, $currentDate, 'End of lease cleaning', 'Expense', '2024', ''),
+                            ('Water', 'Test', 122.11, 1707973200, $currentDate, '', 'Expense', '2024', ''),
+                            ('Gas', 'Test', 57.29, 1707973200, $currentDate, '', 'Expense', '2024', ''),
+                            ('Electricity', 'Test', 259.35, 1707973200, $currentDate, '', 'Expense', '2024', '');
                     ";
+                    command.Parameters.AddWithValue("$currentDate", DateTimeOffset.UtcNow.ToUnixTimeSeconds());
                     command.ExecuteNonQuery();
                 }
             }
@@ -187,10 +191,13 @@ namespace Deductions
                     string transactionType = row.Cells[0].Value.ToString();
                     string category = row.Cells[1].Value.ToString();
                     DateTime date = ((DateTimeOffset)DateTime.Parse(row.Cells[2].Value.ToString())).UtcDateTime;
-                    double value = Double.Parse(row.Cells[3].Value.ToString());
-                    int financialYear = int.Parse(row.Cells[4].Value.ToString());
-                    string investmentName = row.Cells[5].Value.ToString();
-                    transactionList.Add(new Transaction(category, date, value, transactionType, financialYear, investmentName));
+                    DateTime lastModifiedDate = ((DateTimeOffset)DateTime.Parse(row.Cells[3].Value.ToString())).UtcDateTime;
+                    double value = Double.Parse(row.Cells[4].Value.ToString());
+                    int financialYear = int.Parse(row.Cells[5].Value.ToString());
+                    string investmentName = row.Cells[6].Value.ToString();
+                    string notes = row.Cells[7].Value.ToString();
+                    string source = row.Cells[8].Value.ToString();
+                    transactionList.Add(new Transaction(category, date, lastModifiedDate, value, transactionType, financialYear, investmentName, notes, source));
 
                 }
                 Database.DeleteTransactions(transactionList);
@@ -309,6 +316,39 @@ namespace Deductions
             if (createTransactionForm.ShowDialog() == DialogResult.OK)
             {
                 LoadData();
+            }
+        }
+
+        private void importCsvToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "csv files| *.csv";
+            openFileDialog.Title = "Please select a csv file to import.";
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string fileName = openFileDialog.FileName;
+                try
+                {
+                    using (CsvReader csv = new CsvReader(new StreamReader(fileName), true))
+                    {
+                        int fieldCount = csv.FieldCount;
+
+                        string[] headers = csv.GetFieldHeaders();
+                        MessageBox.Show(headers.ToString());
+                        while (csv.ReadNextRecord())
+                        {
+                            for (int i = 0; i < fieldCount; i++)
+                                System.Diagnostics.Debug.WriteLine($" \"{headers[i]} = {csv[i]};\",\r\n");
+
+                            System.Diagnostics.Debug.WriteLine("");
+                        }
+                    }
+                } catch (Exception ex)
+                {
+
+                    System.Diagnostics.Debug.WriteLine(ex);
+                }
+
             }
         }
     }

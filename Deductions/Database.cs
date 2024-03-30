@@ -92,7 +92,7 @@ namespace Deductions
                     System.Diagnostics.Debug.WriteLine($" fy is not set");
                     command.CommandText =
                    @"
-                    SELECT Category, Date, Value, TransactionType
+                    SELECT Category, Date, LastModifiedDate, Value, TransactionType, FinancialYear, Notes, SourceId
                     FROM Transactions
                     WHERE InvestmentName = @investmentName;
                     ";
@@ -101,7 +101,7 @@ namespace Deductions
                     System.Diagnostics.Debug.WriteLine($" fy is  set to {fy}");
                     command.CommandText =
                    @"
-                    SELECT Category, Date, Value, TransactionType
+                    SELECT Category, Date, LastModifiedDate, Value, TransactionType, FinancialYear, Notes, SourceId
                     FROM Transactions
                     WHERE InvestmentName = @investmentName
                     AND FinancialYear = @financialYear;
@@ -119,11 +119,15 @@ namespace Deductions
                     {
 
                         string Category = reader.GetString(0);
-                        DateTime date = UnixTimeStampToDateTime((int) reader.GetInt32(1));
-                        double value = reader.GetDouble(2);
-                        string transactionType = reader.GetString(3);
+                        DateTime date = UnixTimeStampToDateTime(reader.GetInt64(1));
+                        DateTime lastModifiedDate = UnixTimeStampToDateTime(reader.GetInt64(2));
+                        double value = reader.GetDouble(3);
+                        string transactionType = reader.GetString(4);
+                        fy = reader.GetInt32(5);
+                        string notes = reader.GetString(6);
+                        string source = reader.GetString(7);
 
-                        transaction = new Transaction(Category, date, value, transactionType, ToFinancialYear(date), investmentName);
+                        transaction = new Transaction(Category, date, DateTime.UtcNow, value, transactionType, fy, investmentName, notes, source);
                         transactions.Add(transaction);
 
                     }
@@ -205,7 +209,7 @@ namespace Deductions
                 return;
             }
         }
-        public static DateTime UnixTimeStampToDateTime(int unixTimeStamp)
+        public static DateTime UnixTimeStampToDateTime(long unixTimeStamp)
         {
             // Unix timestamp is seconds past epoch
             DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
