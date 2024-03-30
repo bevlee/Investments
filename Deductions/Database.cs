@@ -92,7 +92,7 @@ namespace Deductions
                     System.Diagnostics.Debug.WriteLine($" fy is not set");
                     command.CommandText =
                    @"
-                    SELECT Category, Date, LastModifiedDate, Value, TransactionType, FinancialYear, Notes, SourceId
+                    SELECT Category, Date, LastModifiedDate, Value, TransactionType, FinancialYear, Notes, Source
                     FROM Transactions
                     WHERE InvestmentName = @investmentName;
                     ";
@@ -101,7 +101,7 @@ namespace Deductions
                     System.Diagnostics.Debug.WriteLine($" fy is  set to {fy}");
                     command.CommandText =
                    @"
-                    SELECT Category, Date, LastModifiedDate, Value, TransactionType, FinancialYear, Notes, SourceId
+                    SELECT Category, Date, LastModifiedDate, Value, TransactionType, FinancialYear, Notes, Source
                     FROM Transactions
                     WHERE InvestmentName = @investmentName
                     AND FinancialYear = @financialYear;
@@ -194,14 +194,16 @@ namespace Deductions
                 var createCommand = conn.CreateCommand();
                 createCommand.CommandText =
                     @"
-                        INSERT INTO Transactions (Category, InvestmentName, Value, Date, TransactionType, FinancialYear)
-                        VALUES (@Category, @investmentName, @value, @Date, @transactionType, @FinancialYear);
+                        INSERT INTO Transactions (Category, InvestmentName, Value, Date, LastModifiedDate, TransactionType, FinancialYear, Notes, Source)
+                        VALUES (@Category, @investmentName, @value, @Date, @LastModifiedDate, @transactionType, @FinancialYear, @notes, '');
                     ";
                 createCommand.Parameters.AddWithValue("@Category", transaction.category);
                 createCommand.Parameters.AddWithValue("@investmentName", transaction.investmentName);
                 createCommand.Parameters.AddWithValue("@value", transaction.amount);
                 createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.date).ToUnixTimeSeconds());
+                createCommand.Parameters.AddWithValue("@LastModifiedDate", ((DateTimeOffset)transaction.lastModifiedDate).ToUnixTimeSeconds());
                 createCommand.Parameters.AddWithValue("@transactionType", transaction.TransactionType);
+                createCommand.Parameters.AddWithValue("@notes", transaction.notes);
                 createCommand.Parameters.AddWithValue("@FinancialYear", ToFinancialYear(transaction.date));
 
                 createCommand.ExecuteNonQuery();

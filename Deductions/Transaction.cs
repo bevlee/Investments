@@ -4,10 +4,11 @@
     {
         public string TransactionType { get; }
         public string category { get; }
-        public DateTime date { get; }
-        public DateTime lastModifiedDate { get; }
         public Double amount { get; set; }
+        public DateTime date { get; }
         public int financialYear { get; }
+        public DateTime lastModifiedDate { get; }
+        
         public string investmentName { get; }
         public string notes { get; }
         public string source { get; }

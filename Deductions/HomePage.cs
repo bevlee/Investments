@@ -58,7 +58,7 @@ namespace Deductions
                     }
                 }
                 string[] expectedTables = ["Transactions", "Accounts", "Investments", "Sources"];
-                bool tablesPresent = tables.All(expectedTables.Contains);
+                bool tablesPresent = tables.All(expectedTables.Contains) && (tables.Count == expectedTables.Length);
 
                 //create the tables if they dont exist
                 if (!tablesPresent)
@@ -94,10 +94,10 @@ namespace Deductions
                         TransactionType TEXT NOT NULL,
                         FinancialYear INTEGER NOT NULL,
                         InvestmentName TEXT NOT NULL,
-                        Notes TEXT,
-                        SourceId INTEGER,
+                        Notes TEXT NOT NULL,
+                        Source TEXT NOT NULL,
                         PRIMARY KEY (Category, Date, Value, TransactionType, InvestmentName),
-                        FOREIGN KEY (SourceId) REFERENCES Sources (SourceId),
+                        FOREIGN KEY (Source) REFERENCES Sources (Source),
                         FOREIGN KEY (InvestmentName) REFERENCES Investments (InvestmentName)
                         );
                     ";
@@ -107,7 +107,7 @@ namespace Deductions
                     command.CommandText =
                     @"
                         CREATE TABLE Sources (
-                        SourceId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL
+                        Source VARCHAR PRIMARY KEY NOT NULL
                         );
                     ";
                     command.ExecuteNonQuery();
@@ -131,7 +131,7 @@ namespace Deductions
                     // create dummy transactions
                     command.CommandText =
                     @"
-                        INSERT INTO Transactions (Category, InvestmentName, Value, Date, LastModifiedDate, Notes, TransactionType, FinancialYear, SourceId)
+                        INSERT INTO Transactions (Category, InvestmentName, Value, Date, LastModifiedDate, Notes, TransactionType, FinancialYear, Source)
                         VALUES 
                             ('Rent', 'Test', 1500, 1706679357, $currentDate, '', 'Income', '2024', ''),
                             ('Rent', 'Test', 1500, 1709184957, $currentDate, '', 'Income', '2024', ''),

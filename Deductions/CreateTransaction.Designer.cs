@@ -39,11 +39,13 @@
             TransactionTypeComboBox = new ComboBox();
             TransactionDateLabel = new Label();
             TransactionDatePicker = new DateTimePicker();
+            noteLabel = new Label();
+            noteTextBox = new TextBox();
             SuspendLayout();
             // 
             // createTransactionButton
             // 
-            createTransactionButton.Location = new Point(168, 418);
+            createTransactionButton.Location = new Point(190, 514);
             createTransactionButton.Name = "createTransactionButton";
             createTransactionButton.Size = new Size(75, 23);
             createTransactionButton.TabIndex = 5;
@@ -135,11 +137,30 @@
             TransactionDatePicker.Size = new Size(272, 23);
             TransactionDatePicker.TabIndex = 4;
             // 
+            // noteLabel
+            // 
+            noteLabel.AutoSize = true;
+            noteLabel.Location = new Point(83, 395);
+            noteLabel.Name = "noteLabel";
+            noteLabel.Size = new Size(233, 15);
+            noteLabel.TabIndex = 20;
+            noteLabel.Text = "Enter a note for your Transaction (optional)";
+            // 
+            // noteTextBox
+            // 
+            noteTextBox.Location = new Point(83, 423);
+            noteTextBox.Multiline = true;
+            noteTextBox.Name = "noteTextBox";
+            noteTextBox.Size = new Size(272, 71);
+            noteTextBox.TabIndex = 19;
+            // 
             // CreateTransaction
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(442, 492);
+            ClientSize = new Size(454, 587);
+            Controls.Add(noteLabel);
+            Controls.Add(noteTextBox);
             Controls.Add(TransactionDatePicker);
             Controls.Add(TransactionDateLabel);
             Controls.Add(TransactionTypeComboBox);
@@ -171,5 +192,7 @@
         private ComboBox TransactionTypeComboBox;
         private Label TransactionDateLabel;
         private DateTimePicker TransactionDatePicker;
+        private Label noteLabel;
+        private TextBox noteTextBox;
     }
 }

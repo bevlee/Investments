@@ -74,7 +74,7 @@
                 string name = categoryTextBox.Text;
                 DateTime date = ((DateTimeOffset)TransactionDatePicker.Value).UtcDateTime;
                 int fy = ToFinancialYear(TransactionDatePicker.Value);
-                Database.CreateNewTransaction(new Transaction(name, date, DateTime.UtcNow, value, TransactionTypeComboBox.Text, 24, investmentComboBox.Text, "", ""));
+                Database.CreateNewTransaction(new Transaction(name, date, DateTime.UtcNow, value, TransactionTypeComboBox.Text, 24, investmentComboBox.Text, noteTextBox.Text, ""));
                 this.DialogResult = DialogResult.OK;
             }
         }
