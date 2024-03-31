@@ -1,0 +1,18 @@
+Date,TransactionType,Amount,Category,Note
+27/03/24,Expense,870,Interest,
+12/02/24,Expense,958.24,Interest,
+12/01/24,Expense,1101.55,Interest,
+17/01/24,Expense,99,Mortgage fee,
+11/12/23,Expense,1141.55,Solicitor,
+11/12/23,Expense,324.48,Disbursement,
+19/01/24,Expense,20808.29,Stamp Duty,
+12/12/23,Expense,78.78,Water
+12/12/23,Expense,57.15,Gas,
+12/12/23,Expense,115.20,Electricity,
+12/12/23,Expense,1150,Property Inspection,
+12/12/23,Expense,578.62,Land title office registration,
+12/12/23,Expense,187.92,Land tax,
+25/03/24,Income,2813.84,rent
+25/02/24,Income,3104.3,rent
+25/01/24,Income,2668.61,rent
+25/12/23,Income,2668.61,rent
