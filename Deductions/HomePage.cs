@@ -212,26 +212,20 @@ namespace Deductions
             allTransactions.ForEach(transaction =>
             {
                 netValue += transaction.TransactionType == "Income" ? transaction.amount : -transaction.amount;
-
             });
 
             TransactionDataGridView.DataSource = allTransactions;
-            if (loadNewDates)
-            {
 
-                System.Diagnostics.Debug.WriteLine($" loading new dates!");
-                allDates = new HashSet<string>(["All"]);
-                foreach (Transaction transaction in allTransactions)
-                {
-                    allDates.Add(transaction.financialYear.ToString());
-                }
-                List<string> dates = new List<string>(allDates);
-                FinancialYearComboBox.DataSource = dates;
-                financialYearString = "All";
-                FinancialYearComboBox.SelectedItem = financialYearString;
-                System.Diagnostics.Debug.WriteLine($" new fy is {financialYearString}!");
-                loadNewDates = false;
+            // reload the selected dates
+            allDates = new HashSet<string>(["All"]);
+            foreach (Transaction transaction in allTransactions)
+            {
+                allDates.Add(transaction.financialYear.ToString());
             }
+            List<string> dates = new List<string>(allDates);
+            FinancialYearComboBox.DataSource = dates;
+            FinancialYearComboBox.SelectedItem = financialYearString;
+
             NetValueLabel.Text = $"The net value for investment {investmentName} is {netValue}";
         }
 
@@ -264,7 +258,7 @@ namespace Deductions
                 System.Diagnostics.Debug.WriteLine($" changing investments");
                 investmentName = investmentComboBox.SelectedItem.ToString();
 
-                loadNewDates = true;
+                
                 financialYearString = "All";
                 LoadData();
             }
