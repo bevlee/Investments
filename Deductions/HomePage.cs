@@ -230,10 +230,10 @@ namespace Deductions
             NetValueLabel.Text = $"The net value for investment {selectedInvestment} is {netValue}";
         }
 
-        private void createInvestmentButton_Click(object sender, EventArgs e)
+        private void manageInvestmentsButton_Click(object sender, EventArgs e)
         {
-            CreateInvestment createInvestmentForm = new CreateInvestment();
-            if (createInvestmentForm.ShowDialog() == DialogResult.OK)
+            ManageInvestments manageInvestmentsForm = new ManageInvestments();
+            if (manageInvestmentsForm.ShowDialog() == DialogResult.OK)
             {
                 LoadData();
             }
@@ -247,6 +247,7 @@ namespace Deductions
             if (createTransactionForm.ShowDialog() == DialogResult.OK)
             {
                 LoadData();
+                createTransactionForm.Close();
             }
         }
 
@@ -259,7 +260,7 @@ namespace Deductions
                 System.Diagnostics.Debug.WriteLine($" changing investments");
                 selectedInvestment = investmentComboBox.SelectedItem.ToString();
 
-                
+
                 financialYearString = "All";
                 LoadData();
             }
@@ -331,7 +332,7 @@ namespace Deductions
             openFileDialog.Filter = "csv files| *.csv";
             openFileDialog.Title = "Please select a csv file to import.";
 
-            
+
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 string fileName = openFileDialog.FileName;
@@ -356,12 +357,13 @@ namespace Deductions
                                     note = csv[4];
                                 }
                                 transaction = new Transaction(category, date, lastModifiedDate, amount, TransactionType, financialYear, investmentName, note, source);
-                                    //System.Diagnostics.Debug.WriteLine($" \"{headers[i]} = {csv[i]}\",\r\n");
+                                //System.Diagnostics.Debug.WriteLine($" \"{headers[i]} = {csv[i]}\",\r\n");
                                 transactions.Add(transaction);
 
                                 System.Diagnostics.Debug.WriteLine("");
                             }
-                        } else
+                        }
+                        else
                         {
                             throw new Exception("mandatory fields not present in csv file");
                         }
@@ -370,7 +372,8 @@ namespace Deductions
                     Database.CreateNewTransactions(transactions);
                     LoadData();
 
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     if (ex.Message == "mandatory fields not present in csv file")
                     {
@@ -381,5 +384,6 @@ namespace Deductions
 
             }
         }
+
     }
 }

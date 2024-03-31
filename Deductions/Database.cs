@@ -49,6 +49,34 @@ namespace Deductions
             }
             return investments;
         }
+        public static List<(string, string)> getAllInvestmentsAndAccounts()
+        {
+            List<(string, string)> investments = new List<(string, string)>();
+
+            using (SQLiteConnection conn = CreateConnection())
+            {
+
+                var command = conn.CreateCommand();
+                command.CommandText =
+                    @"
+                    SELECT InvestmentName, AccountName
+                    FROM Investments;
+                    ";
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+
+                        var investment = reader.GetString(0);
+                        var accountName = reader.GetString(1);
+                        investments.Add((investment, accountName));
+                    }
+                }
+
+            }
+            return investments;
+        }
+
 
         public static List<String> getInvestments(string accountName)
         {
@@ -276,6 +304,22 @@ namespace Deductions
                     int changed = createCommand.ExecuteNonQuery();
                     System.Diagnostics.Debug.WriteLine($"{changed}!");
                 }
+
+                return;
+            }
+        }
+        public static void DeleteInvestment(string investmentName)
+        {
+            using (SQLiteConnection conn = CreateConnection())
+            {
+                var createCommand = conn.CreateCommand();
+                createCommand.CommandText =
+                @"
+                    DELETE FROM Investments 
+                    WHERE InvestmentName=@investmentName;
+                ";
+                createCommand.Parameters.AddWithValue("@investmentName", investmentName);
+                int changed = createCommand.ExecuteNonQuery();               
 
                 return;
             }

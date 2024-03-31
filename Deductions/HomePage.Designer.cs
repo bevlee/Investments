@@ -25,7 +25,7 @@ namespace Deductions
 
         private Button GetCreateInvestmentButton()
         {
-            return createInvestmentButton;
+            return manageInvestmentsButton;
         }
 
         #region Windows Form Designer generated code
@@ -37,7 +37,7 @@ namespace Deductions
         private void InitializeComponent()
         {
             AccountLabel = new Label();
-            createInvestmentButton = new Button();
+            manageInvestmentsButton = new Button();
             accountComboBox = new ComboBox();
             investmentComboBox = new ComboBox();
             InvestmentLabel = new Label();
@@ -68,16 +68,16 @@ namespace Deductions
             AccountLabel.TabIndex = 1;
             AccountLabel.Text = "Account";
             // 
-            // createInvestmentButton
+            // manageInvestmentsButton
             // 
-            createInvestmentButton.BackColor = Color.GreenYellow;
-            createInvestmentButton.Location = new Point(160, 102);
-            createInvestmentButton.Name = "createInvestmentButton";
-            createInvestmentButton.Size = new Size(121, 24);
-            createInvestmentButton.TabIndex = 2;
-            createInvestmentButton.Text = "Create Investment";
-            createInvestmentButton.UseVisualStyleBackColor = false;
-            createInvestmentButton.Click += createInvestmentButton_Click;
+            manageInvestmentsButton.BackColor = Color.GreenYellow;
+            manageInvestmentsButton.Location = new Point(160, 102);
+            manageInvestmentsButton.Name = "manageInvestmentsButton";
+            manageInvestmentsButton.Size = new Size(138, 24);
+            manageInvestmentsButton.TabIndex = 2;
+            manageInvestmentsButton.Text = "Manage Investments";
+            manageInvestmentsButton.UseVisualStyleBackColor = false;
+            manageInvestmentsButton.Click += manageInvestmentsButton_Click;
             // 
             // accountComboBox
             // 
@@ -94,7 +94,7 @@ namespace Deductions
             investmentComboBox.FormattingEnabled = true;
             investmentComboBox.Location = new Point(160, 73);
             investmentComboBox.Name = "investmentComboBox";
-            investmentComboBox.Size = new Size(121, 23);
+            investmentComboBox.Size = new Size(138, 23);
             investmentComboBox.TabIndex = 5;
             investmentComboBox.DropDownClosed += investmentComboBox_SelectionChanged;
             // 
@@ -250,7 +250,7 @@ namespace Deductions
             Controls.Add(investmentComboBox);
             Controls.Add(InvestmentLabel);
             Controls.Add(accountComboBox);
-            Controls.Add(createInvestmentButton);
+            Controls.Add(manageInvestmentsButton);
             Controls.Add(AccountLabel);
             Controls.Add(menuStrip1);
             MainMenuStrip = menuStrip1;
@@ -266,7 +266,7 @@ namespace Deductions
 
         #endregion
         private Label AccountLabel;
-        private Button createInvestmentButton;
+        private Button manageInvestmentsButton;
         private ComboBox accountComboBox;
         private ComboBox investmentComboBox;
         private Label InvestmentLabel;
