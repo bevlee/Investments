@@ -6,10 +6,11 @@ namespace Deductions
     public partial class HomePage : Form
     {
         private string accountName;
-        private string? investmentName = null;
+        private string? selectedInvestment = null;
         private string financialYearString = "All";
         private bool loadNewDates = true;
         private HashSet<string> allDates;
+        private string[] mandatoryFields = ["Category", "TransactionType", "Amount", "Date"];
 
         public HomePage()
         {
@@ -94,7 +95,7 @@ namespace Deductions
                         TransactionType TEXT NOT NULL,
                         FinancialYear INTEGER NOT NULL,
                         InvestmentName TEXT NOT NULL,
-                        Notes TEXT NOT NULL,
+                        Note TEXT NOT NULL,
                         Source TEXT NOT NULL,
                         PRIMARY KEY (Category, Date, Value, TransactionType, InvestmentName),
                         FOREIGN KEY (Source) REFERENCES Sources (Source),
@@ -131,7 +132,7 @@ namespace Deductions
                     // create dummy transactions
                     command.CommandText =
                     @"
-                        INSERT INTO Transactions (Category, InvestmentName, Value, Date, LastModifiedDate, Notes, TransactionType, FinancialYear, Source)
+                        INSERT INTO Transactions (Category, InvestmentName, Value, Date, LastModifiedDate, Note, TransactionType, FinancialYear, Source)
                         VALUES 
                             ('Rent', 'Test', 1500, 1706679357, $currentDate, '', 'Income', '2024', ''),
                             ('Rent', 'Test', 1500, 1709184957, $currentDate, '', 'Income', '2024', ''),
@@ -161,7 +162,7 @@ namespace Deductions
 
             foreach (string investment in investments)
             {
-                if (investment == investmentName)
+                if (investment == selectedInvestment)
                 {
                     investmentsWithSelection = investmentsWithSelection.Prepend(investment).ToList();
                 }
@@ -174,7 +175,7 @@ namespace Deductions
 
             investmentComboBox.DataSource = investmentsWithSelection;
             investmentComboBox.SelectedIndex = 0;
-            investmentName = investmentsWithSelection[0];
+            selectedInvestment = investmentsWithSelection[0];
 
             DisplayTransactions();
         }
@@ -190,14 +191,14 @@ namespace Deductions
                 {
                     string transactionType = row.Cells[0].Value.ToString();
                     string category = row.Cells[1].Value.ToString();
-                    DateTime date = ((DateTimeOffset)DateTime.Parse(row.Cells[2].Value.ToString())).UtcDateTime;
-                    DateTime lastModifiedDate = ((DateTimeOffset)DateTime.Parse(row.Cells[3].Value.ToString())).UtcDateTime;
-                    double value = Double.Parse(row.Cells[4].Value.ToString());
-                    int financialYear = int.Parse(row.Cells[5].Value.ToString());
-                    string investmentName = row.Cells[6].Value.ToString();
-                    string notes = row.Cells[7].Value.ToString();
+                    double value = Double.Parse(row.Cells[2].Value.ToString());
+                    DateTime date = ((DateTimeOffset)DateTime.Parse(row.Cells[3].Value.ToString())).UtcDateTime;
+                    int financialYear = int.Parse(row.Cells[4].Value.ToString());
+                    DateTime lastModifiedDate = ((DateTimeOffset)DateTime.Parse(row.Cells[5].Value.ToString())).UtcDateTime;
+                    string selectedInvestment = row.Cells[6].Value.ToString();
+                    string note = row.Cells[7].Value.ToString();
                     string source = row.Cells[8].Value.ToString();
-                    transactionList.Add(new Transaction(category, date, lastModifiedDate, value, transactionType, financialYear, investmentName, notes, source));
+                    transactionList.Add(new Transaction(category, date, lastModifiedDate, value, transactionType, financialYear, selectedInvestment, note, source));
 
                 }
                 Database.DeleteTransactions(transactionList);
@@ -207,7 +208,7 @@ namespace Deductions
         private void DisplayTransactions()
         {
             System.Diagnostics.Debug.WriteLine($" displaying transactions!");
-            List<Transaction> allTransactions = Database.LoadTransactions(investmentName, financialYearString);
+            List<Transaction> allTransactions = Database.LoadTransactions(selectedInvestment, financialYearString);
             double netValue = 0;
             allTransactions.ForEach(transaction =>
             {
@@ -226,7 +227,7 @@ namespace Deductions
             FinancialYearComboBox.DataSource = dates;
             FinancialYearComboBox.SelectedItem = financialYearString;
 
-            NetValueLabel.Text = $"The net value for investment {investmentName} is {netValue}";
+            NetValueLabel.Text = $"The net value for investment {selectedInvestment} is {netValue}";
         }
 
         private void createInvestmentButton_Click(object sender, EventArgs e)
@@ -242,7 +243,7 @@ namespace Deductions
         private void createTransactionButton_Click(object sender, EventArgs e)
         {
 
-            CreateTransaction createTransactionForm = new CreateTransaction(investmentName);
+            CreateTransaction createTransactionForm = new CreateTransaction(selectedInvestment);
             if (createTransactionForm.ShowDialog() == DialogResult.OK)
             {
                 LoadData();
@@ -251,12 +252,12 @@ namespace Deductions
 
         private void investmentComboBox_SelectionChanged(object sender, EventArgs e)
         {
-            if (investmentComboBox.SelectedItem.ToString() != investmentName)
+            if (investmentComboBox.SelectedItem.ToString() != selectedInvestment)
             {
                 //MessageBox.Show("Selected value changed to: " + investmentComboBox.SelectedItem.ToString());
 
                 System.Diagnostics.Debug.WriteLine($" changing investments");
-                investmentName = investmentComboBox.SelectedItem.ToString();
+                selectedInvestment = investmentComboBox.SelectedItem.ToString();
 
                 
                 financialYearString = "All";
@@ -297,7 +298,7 @@ namespace Deductions
 
         private void createIncomeButton_Click(object sender, EventArgs e)
         {
-            CreateTransaction createTransactionForm = new CreateTransaction(investmentName, "Income");
+            CreateTransaction createTransactionForm = new CreateTransaction(selectedInvestment, "Income");
             if (createTransactionForm.ShowDialog() == DialogResult.OK)
             {
                 LoadData();
@@ -306,7 +307,7 @@ namespace Deductions
 
         private void createExpenseButton_Click(object sender, EventArgs e)
         {
-            CreateTransaction createTransactionForm = new CreateTransaction(investmentName, "Expense");
+            CreateTransaction createTransactionForm = new CreateTransaction(selectedInvestment, "Expense");
             if (createTransactionForm.ShowDialog() == DialogResult.OK)
             {
                 LoadData();
@@ -315,9 +316,22 @@ namespace Deductions
 
         private void importCsvToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            List<Transaction> transactions = new List<Transaction>();
+            Transaction transaction;
+            string category;
+            string TransactionType;
+            DateTime date;
+            DateTime lastModifiedDate = DateTime.UtcNow;
+            double amount;
+            int financialYear;
+            string investmentName = selectedInvestment;
+            string note = "";
+            string source = "";
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "csv files| *.csv";
             openFileDialog.Title = "Please select a csv file to import.";
+
+            
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 string fileName = openFileDialog.FileName;
@@ -325,21 +339,43 @@ namespace Deductions
                 {
                     using (CsvReader csv = new CsvReader(new StreamReader(fileName), true))
                     {
+                        csv.MissingFieldAction = MissingFieldAction.ReplaceByEmpty;
                         int fieldCount = csv.FieldCount;
-
                         string[] headers = csv.GetFieldHeaders();
-                        MessageBox.Show(headers.ToString());
-                        while (csv.ReadNextRecord())
+                        if (mandatoryFields.All(headers.Contains))
                         {
-                            for (int i = 0; i < fieldCount; i++)
-                                System.Diagnostics.Debug.WriteLine($" \"{headers[i]} = {csv[i]};\",\r\n");
+                            while (csv.ReadNextRecord())
+                            {
+                                category = csv[3];
+                                TransactionType = csv[1];
+                                date = DateTime.Parse(csv[0]);
+                                amount = double.Parse(csv[2]);
+                                financialYear = Database.ToFinancialYear(date);
+                                if (headers.Length > 4 && headers[4] == "note")
+                                {
+                                    note = csv[4];
+                                }
+                                transaction = new Transaction(category, date, lastModifiedDate, amount, TransactionType, financialYear, investmentName, note, source);
+                                    //System.Diagnostics.Debug.WriteLine($" \"{headers[i]} = {csv[i]}\",\r\n");
+                                transactions.Add(transaction);
 
-                            System.Diagnostics.Debug.WriteLine("");
+                                System.Diagnostics.Debug.WriteLine("");
+                            }
+                        } else
+                        {
+                            throw new Exception("mandatory fields not present in csv file");
                         }
+
                     }
+                    Database.CreateNewTransactions(transactions);
+                    LoadData();
+
                 } catch (Exception ex)
                 {
-
+                    if (ex.Message == "mandatory fields not present in csv file")
+                    {
+                        MessageBox.Show(ex.Message + ". Please ensure the format is Date, TransactionType, Amount, Category, Notes (optional)");
+                    }
                     System.Diagnostics.Debug.WriteLine(ex);
                 }
 

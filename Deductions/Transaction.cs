@@ -10,7 +10,7 @@
         public DateTime lastModifiedDate { get; }
         
         public string investmentName { get; }
-        public string notes { get; }
+        public string note { get; }
         public string source { get; }
 
         public Transaction(string category,
@@ -20,7 +20,7 @@
                             string TransactionType,
                             int financialYear,
                             string investmentName,
-                            string notes,
+                            string note,
                             string source)
         {
             this.category = category;
@@ -30,11 +30,8 @@
             this.amount = amount;
             this.financialYear = financialYear;
             this.investmentName = investmentName;
-            this.notes = notes;
+            this.note = note;
             this.source = source;
         }
-        
     }
-
-    
 }

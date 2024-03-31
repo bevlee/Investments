@@ -92,7 +92,7 @@ namespace Deductions
                     System.Diagnostics.Debug.WriteLine($" fy is not set");
                     command.CommandText =
                    @"
-                    SELECT Category, Date, LastModifiedDate, Value, TransactionType, FinancialYear, Notes, Source
+                    SELECT Category, Date, LastModifiedDate, Value, TransactionType, FinancialYear, Note, Source
                     FROM Transactions
                     WHERE InvestmentName = @investmentName;
                     ";
@@ -101,7 +101,7 @@ namespace Deductions
                     System.Diagnostics.Debug.WriteLine($" fy is  set to {fy}");
                     command.CommandText =
                    @"
-                    SELECT Category, Date, LastModifiedDate, Value, TransactionType, FinancialYear, Notes, Source
+                    SELECT Category, Date, LastModifiedDate, Value, TransactionType, FinancialYear, Note, Source
                     FROM Transactions
                     WHERE InvestmentName = @investmentName
                     AND FinancialYear = @financialYear;
@@ -124,10 +124,10 @@ namespace Deductions
                         double value = reader.GetDouble(3);
                         string transactionType = reader.GetString(4);
                         fy = reader.GetInt32(5);
-                        string notes = reader.GetString(6);
+                        string note = reader.GetString(6);
                         string source = reader.GetString(7);
 
-                        transaction = new Transaction(Category, date, DateTime.UtcNow, value, transactionType, fy, investmentName, notes, source);
+                        transaction = new Transaction(Category, date, lastModifiedDate, value, transactionType, fy, investmentName, note, source);
                         transactions.Add(transaction);
 
                     }
@@ -185,7 +185,7 @@ namespace Deductions
             }
         }
 
-        internal static void CreateNewTransaction(Transaction transaction)
+        internal static void CreateNewTransactions(Transaction transaction)
         {   
 
             using (SQLiteConnection conn = CreateConnection())
@@ -194,8 +194,8 @@ namespace Deductions
                 var createCommand = conn.CreateCommand();
                 createCommand.CommandText =
                     @"
-                        INSERT INTO Transactions (Category, InvestmentName, Value, Date, LastModifiedDate, TransactionType, FinancialYear, Notes, Source)
-                        VALUES (@Category, @investmentName, @value, @Date, @LastModifiedDate, @transactionType, @FinancialYear, @notes, '');
+                        INSERT INTO Transactions (Category, InvestmentName, Value, Date, LastModifiedDate, TransactionType, FinancialYear, Note, Source)
+                        VALUES (@Category, @investmentName, @value, @Date, @LastModifiedDate, @transactionType, @FinancialYear, @note, '');
                     ";
                 createCommand.Parameters.AddWithValue("@Category", transaction.category);
                 createCommand.Parameters.AddWithValue("@investmentName", transaction.investmentName);
@@ -203,10 +203,37 @@ namespace Deductions
                 createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.date).ToUnixTimeSeconds());
                 createCommand.Parameters.AddWithValue("@LastModifiedDate", ((DateTimeOffset)transaction.lastModifiedDate).ToUnixTimeSeconds());
                 createCommand.Parameters.AddWithValue("@transactionType", transaction.TransactionType);
-                createCommand.Parameters.AddWithValue("@notes", transaction.notes);
+                createCommand.Parameters.AddWithValue("@note", transaction.note);
                 createCommand.Parameters.AddWithValue("@FinancialYear", ToFinancialYear(transaction.date));
 
                 createCommand.ExecuteNonQuery();
+
+                return;
+            }
+        }
+        internal static void CreateNewTransactions(List<Transaction> transactions)
+        {
+            using (SQLiteConnection conn = CreateConnection())
+            {
+                foreach (Transaction transaction in transactions)
+                {
+                    var createCommand = conn.CreateCommand();
+                    createCommand.CommandText =
+                        @"
+                        INSERT INTO Transactions (Category, InvestmentName, Value, Date, LastModifiedDate, TransactionType, FinancialYear, Note, Source)
+                        VALUES (@Category, @investmentName, @value, @Date, @LastModifiedDate, @transactionType, @FinancialYear, @note, '');
+                    ";
+                    createCommand.Parameters.AddWithValue("@Category", transaction.category);
+                    createCommand.Parameters.AddWithValue("@investmentName", transaction.investmentName);
+                    createCommand.Parameters.AddWithValue("@value", transaction.amount);
+                    createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.date).ToUnixTimeSeconds());
+                    createCommand.Parameters.AddWithValue("@LastModifiedDate", ((DateTimeOffset)transaction.lastModifiedDate).ToUnixTimeSeconds());
+                    createCommand.Parameters.AddWithValue("@transactionType", transaction.TransactionType);
+                    createCommand.Parameters.AddWithValue("@note", transaction.note);
+                    createCommand.Parameters.AddWithValue("@FinancialYear", ToFinancialYear(transaction.date));
+
+                    createCommand.ExecuteNonQuery();
+                }
 
                 return;
             }
