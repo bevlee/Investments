@@ -54,6 +54,7 @@ namespace Deductions
             fileToolStripMenuItem = new ToolStripMenuItem();
             importCsvToolStripMenuItem = new ToolStripMenuItem();
             openFileDialog1 = new OpenFileDialog();
+            generateReportButton = new Button();
             ((System.ComponentModel.ISupportInitialize)TransactionDataGridView).BeginInit();
             menuStrip1.SuspendLayout();
             SuspendLayout();
@@ -233,11 +234,23 @@ namespace Deductions
             // 
             openFileDialog1.FileName = "openFileDialog1";
             // 
+            // generateReportButton
+            // 
+            generateReportButton.BackColor = Color.PaleGoldenrod;
+            generateReportButton.Location = new Point(1086, 552);
+            generateReportButton.Name = "generateReportButton";
+            generateReportButton.Size = new Size(141, 40);
+            generateReportButton.TabIndex = 16;
+            generateReportButton.Text = "Generate Report";
+            generateReportButton.UseVisualStyleBackColor = false;
+            generateReportButton.Click += generateReportButton_Click;
+            // 
             // HomePage
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1248, 604);
+            Controls.Add(generateReportButton);
             Controls.Add(createExpenseButton);
             Controls.Add(createIncomeButton);
             Controls.Add(DeleteButton);
@@ -283,5 +296,6 @@ namespace Deductions
         private ToolStripMenuItem fileToolStripMenuItem;
         private ToolStripMenuItem importCsvToolStripMenuItem;
         private OpenFileDialog openFileDialog1;
+        private Button generateReportButton;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Data.SQLite;
+using System.Transactions;
 
 namespace Deductions
 {
@@ -323,6 +324,57 @@ namespace Deductions
 
                 return;
             }
+        }
+
+        public static List<Tuple<string, double>> getSummary(string accountName, string investmentName, string financialYear)
+        {
+            List<Tuple<string, double>> CategorySummary = new List<Tuple<string, double>>();
+
+            using (SQLiteConnection conn = CreateConnection())
+            {
+
+                var command = conn.CreateCommand();
+
+                int fy;
+                System.Diagnostics.Debug.WriteLine($" loading transactions");
+                if (!int.TryParse(financialYear, out fy))
+                {
+                    command.CommandText =
+                    @"
+                        SELECT Category, sum(value)
+                        from transactions
+                        WHERE InvestmentName=@investmentName
+                        group by category;
+                    ";
+                    command.Parameters.AddWithValue("@investmentName", investmentName);
+                } else
+                {
+                    command.CommandText =
+                    @"
+                        SELECT Category, sum(value)
+                        from transactions
+                        WHERE InvestmentName=@investmentName
+                        AND FinancialYear = @fy
+                        group by category;
+                    ";
+                    command.Parameters.AddWithValue("@investmentName", investmentName);
+                    command.Parameters.AddWithValue("@fy", fy);
+                    
+                }
+                using (var reader = command.ExecuteReader())
+                {
+                    Transaction? transaction = null;
+                    while (reader.Read())
+                    {
+                        string Category = reader.GetString(0);
+                        double value = reader.GetDouble(1);
+
+                        CategorySummary.Add(new Tuple<string, double>(Category, value));
+
+                    }
+                }
+            }
+            return CategorySummary;
         }
     }
 }

@@ -18,7 +18,6 @@ namespace Deductions
             InitDb();
             LoadData();
         }
-
         private void InitDb()
         {
             string appDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Deductions");
@@ -51,7 +50,6 @@ namespace Deductions
                 ";
                 using (var reader = command.ExecuteReader())
                 {
-
                     while (reader.Read())
                     {
                         var tableName = reader.GetString(0);
@@ -332,7 +330,6 @@ namespace Deductions
             openFileDialog.Filter = "csv files| *.csv";
             openFileDialog.Title = "Please select a csv file to import.";
 
-
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 string fileName = openFileDialog.FileName;
@@ -381,9 +378,17 @@ namespace Deductions
                     }
                     System.Diagnostics.Debug.WriteLine(ex);
                 }
-
             }
         }
 
+        private void generateReportButton_Click(object sender, EventArgs e)
+        {
+            List<Tuple<string, double>> categorySummary = Database.getSummary(accountName, selectedInvestment, financialYearString);
+            //System.Diagnostics.Debug.WriteLine($" \"{headers[i]} = {csv[i]}\",\r\n");
+            foreach(Tuple<string, double> category in categorySummary)
+            {
+                System.Diagnostics.Debug.WriteLine($" \"{category.Item1} = {category.Item2}\",\r\n");
+            }
+        }
     }
 }
