@@ -1,11 +1,8 @@
 using System.Data.SQLite;
-using System.IO;
 using LumenWorks.Framework.IO.Csv;
-using iText;
 using iText.Kernel.Pdf;
 using iText.Layout.Element;
 using iText.Layout;
-using System.Windows.Forms;
 using iText.Kernel.Colors;
 using iText.IO.Font.Constants;
 using iText.Kernel.Font;

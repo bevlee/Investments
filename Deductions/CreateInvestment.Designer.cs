@@ -90,6 +90,7 @@
             Controls.Add(Account_Label);
             Controls.Add(confirmCreateInvestment);
             Name = "CreateInvestment";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "CreateInvestment";
             ResumeLayout(false);
             PerformLayout();
