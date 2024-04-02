@@ -137,7 +137,7 @@ namespace Deductions
             // createTransactionButton
             // 
             createTransactionButton.BackColor = Color.PaleGoldenrod;
-            createTransactionButton.Location = new Point(1094, 393);
+            createTransactionButton.Location = new Point(1086, 264);
             createTransactionButton.Name = "createTransactionButton";
             createTransactionButton.Size = new Size(141, 40);
             createTransactionButton.TabIndex = 8;
@@ -168,7 +168,7 @@ namespace Deductions
             // NetValueLabel
             // 
             NetValueLabel.AutoSize = true;
-            NetValueLabel.Location = new Point(34, 540);
+            NetValueLabel.Location = new Point(26, 526);
             NetValueLabel.Name = "NetValueLabel";
             NetValueLabel.Size = new Size(58, 15);
             NetValueLabel.TabIndex = 11;
@@ -188,23 +188,25 @@ namespace Deductions
             // createIncomeButton
             // 
             createIncomeButton.BackColor = Color.YellowGreen;
-            createIncomeButton.Location = new Point(1094, 439);
+            createIncomeButton.Location = new Point(1086, 310);
             createIncomeButton.Name = "createIncomeButton";
             createIncomeButton.Size = new Size(141, 40);
             createIncomeButton.TabIndex = 13;
             createIncomeButton.Text = "Create Income";
             createIncomeButton.UseVisualStyleBackColor = false;
+            createIncomeButton.Visible = false;
             createIncomeButton.Click += createIncomeButton_Click;
             // 
             // createExpenseButton
             // 
             createExpenseButton.BackColor = Color.Red;
-            createExpenseButton.Location = new Point(1094, 483);
+            createExpenseButton.Location = new Point(1086, 354);
             createExpenseButton.Name = "createExpenseButton";
             createExpenseButton.Size = new Size(141, 40);
             createExpenseButton.TabIndex = 14;
             createExpenseButton.Text = "Create Expense";
             createExpenseButton.UseVisualStyleBackColor = false;
+            createExpenseButton.Visible = false;
             createExpenseButton.Click += createExpenseButton_Click;
             // 
             // menuStrip1
@@ -237,7 +239,7 @@ namespace Deductions
             // generateReportButton
             // 
             generateReportButton.BackColor = Color.PaleGoldenrod;
-            generateReportButton.Location = new Point(1086, 552);
+            generateReportButton.Location = new Point(1086, 483);
             generateReportButton.Name = "generateReportButton";
             generateReportButton.Size = new Size(141, 40);
             generateReportButton.TabIndex = 16;
