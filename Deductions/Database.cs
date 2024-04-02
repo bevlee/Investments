@@ -326,9 +326,9 @@ namespace Deductions
             }
         }
 
-        public static List<Tuple<string, double>> getSummary(string accountName, string investmentName, string financialYear)
+        public static List<Tuple<string, string, double>> getSummary(string accountName, string investmentName, string financialYear)
         {
-            List<Tuple<string, double>> CategorySummary = new List<Tuple<string, double>>();
+            List<Tuple<string, string, double>> CategorySummary = new List<Tuple<string, string, double>>();
 
             using (SQLiteConnection conn = CreateConnection())
             {
@@ -341,7 +341,7 @@ namespace Deductions
                 {
                     command.CommandText =
                     @"
-                        SELECT Category, sum(value)
+                        SELECT Category, TransactionType, sum(value)
                         from transactions
                         WHERE InvestmentName=@investmentName
                         group by category;
@@ -351,7 +351,7 @@ namespace Deductions
                 {
                     command.CommandText =
                     @"
-                        SELECT Category, sum(value)
+                        SELECT Category, TransactionType, sum(value)
                         from transactions
                         WHERE InvestmentName=@investmentName
                         AND FinancialYear = @fy
@@ -367,9 +367,10 @@ namespace Deductions
                     while (reader.Read())
                     {
                         string Category = reader.GetString(0);
-                        double value = reader.GetDouble(1);
+                        string transactionType = reader.GetString(1);
+                        double value = reader.GetDouble(2);
 
-                        CategorySummary.Add(new Tuple<string, double>(Category, value));
+                        CategorySummary.Add(new Tuple<string, string, double>(Category, transactionType, value));
 
                     }
                 }

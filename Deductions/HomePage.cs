@@ -1,6 +1,15 @@
 using System.Data.SQLite;
 using System.IO;
 using LumenWorks.Framework.IO.Csv;
+using iText;
+using iText.Kernel.Pdf;
+using iText.Layout.Element;
+using iText.Layout;
+using System.Windows.Forms;
+using iText.Kernel.Colors;
+using iText.IO.Font.Constants;
+using iText.Kernel.Font;
+using iText.Layout.Properties;
 namespace Deductions
 {
     public partial class HomePage : Form
@@ -383,11 +392,66 @@ namespace Deductions
 
         private void generateReportButton_Click(object sender, EventArgs e)
         {
-            List<Tuple<string, double>> categorySummary = Database.getSummary(accountName, selectedInvestment, financialYearString);
+            List<Tuple<string, string, double>> categorySummary = Database.getSummary(accountName, selectedInvestment, financialYearString);
             //System.Diagnostics.Debug.WriteLine($" \"{headers[i]} = {csv[i]}\",\r\n");
-            foreach(Tuple<string, double> category in categorySummary)
+            List<Tuple<string, double>> expenses = new List<Tuple<string, double>>();
+            List<Tuple<string, double>> income = new List<Tuple<string, double>>();
+            foreach (Tuple<string, string, double> category in categorySummary)
             {
-                System.Diagnostics.Debug.WriteLine($" \"{category.Item1} = {category.Item2}\",\r\n");
+                System.Diagnostics.Debug.WriteLine($" \"{category.Item1} = {category.Item3}\",\r\n");
+                if (category.Item2 == "Expense")
+                {
+                    expenses.Add(new Tuple<string, double>(category.Item1, category.Item3));
+                }
+                else
+                {
+                    income.Add(new Tuple<string, double>(category.Item1, category.Item3));
+                }
+            }
+            double incomeTotal = income.Sum(x => x.Item2);
+            double expensesTotal = expenses.Sum(x => x.Item2);
+            double total = Math.Round(incomeTotal - expensesTotal, 2, MidpointRounding.AwayFromZero);
+            string totalString = total > 0 ? "$" + total : "-$" + total * -1;
+            
+
+            Stream myStream;
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "pdf files | *.pdf";
+            saveFileDialog.FilterIndex = 2;
+            saveFileDialog.RestoreDirectory = true;
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                PdfDocument pdfDoc = new PdfDocument(new PdfWriter(saveFileDialog.FileName));
+                Document doc = new Document(pdfDoc);
+                PdfFont code = PdfFontFactory.CreateFont(StandardFonts.COURIER);
+
+                
+                Style titleStyle = new Style()
+                .SetFont(code)
+                .SetFontSize(28)
+                .SetFontColor(ColorConstants.RED)
+                .SetBackgroundColor(ColorConstants.LIGHT_GRAY);
+                Paragraph title = new Paragraph($"{(financialYearString == "All" ? "Historical" : financialYearString)} summary for {selectedInvestment}").AddStyle(titleStyle);
+
+                doc.Add(title);
+
+                Table table = new Table(UnitValue.CreatePercentArray(new float[] { 80, 10, 10 }));
+                table.SetMarginTop(5);
+                table.AddCell("Category");
+                table.AddCell("Expense");
+                table.AddCell("Income");
+                foreach (Tuple<string, string, double> item in categorySummary)
+                {
+                    table.AddCell(item.Item1);
+                    table.AddCell(item.Item2 == "Expense" ? item.Item3.ToString() : "");
+                    table.AddCell(item.Item2 == "Expense" ? "" : item.Item3.ToString());
+                }
+                table.AddCell("Total");
+                table.AddCell(new Cell(1, 2).Add(new Paragraph(totalString)));
+                
+                doc.Add(table);
+
+                doc.Close();
             }
         }
     }

@@ -15,6 +15,13 @@ Date, TransactionType, Amount, Category, Note (optional)
 
 The standalone bin is stored as Deductions.zip
 
+## Generating a report
+
+A pdf report can be generated to summarise the currently selected FY and investment.
+An example of the generated pdf can be seen below:
+![example_pdf](Deductions/resources/examplepdf.png)
+
+
 Coming up:
-- generation of reports for FY by category
 - store the source of a document within the app as a reference
+
