@@ -14,7 +14,6 @@ namespace Deductions
         private string accountName;
         private string? selectedInvestment = null;
         private string financialYearString = "All";
-        private bool loadNewDates = true;
         private HashSet<string> allDates;
         private string[] mandatoryFields = ["Category", "TransactionType", "Amount", "Date"];
 
@@ -175,7 +174,6 @@ namespace Deductions
                     investmentsWithSelection.Add(investment);
                 }
             }
-            System.Diagnostics.Debug.WriteLine($"lnegth of investmentts is, {investmentsWithSelection.Count} !");
 
             investmentComboBox.DataSource = investmentsWithSelection;
             investmentComboBox.SelectedIndex = 0;
@@ -243,7 +241,6 @@ namespace Deductions
             }
         }
 
-
         private void createTransactionButton_Click(object sender, EventArgs e)
         {
 
@@ -269,7 +266,6 @@ namespace Deductions
                 LoadData();
             }
         }
-
         private void financialYearComboBox_SelectionChanged(object sender, EventArgs e)
         {
             //MessageBox.Show("Selected value changed to: " + investmentComboBox.SelectedItem.ToString());
@@ -409,7 +405,6 @@ namespace Deductions
             double expensesTotal = expenses.Sum(x => x.Item2);
             double total = Math.Round(incomeTotal - expensesTotal, 2, MidpointRounding.AwayFromZero);
             string totalString = total > 0 ? "$" + total : "-$" + total * -1;
-            
 
             Stream myStream;
             SaveFileDialog saveFileDialog = new SaveFileDialog();
@@ -421,7 +416,6 @@ namespace Deductions
                 PdfDocument pdfDoc = new PdfDocument(new PdfWriter(saveFileDialog.FileName));
                 Document doc = new Document(pdfDoc);
                 PdfFont code = PdfFontFactory.CreateFont(StandardFonts.COURIER);
-
                 
                 Style titleStyle = new Style()
                 .SetFont(code)

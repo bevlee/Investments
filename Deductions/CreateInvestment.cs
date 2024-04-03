@@ -7,9 +7,7 @@
             InitializeComponent();
             List<string> accounts = Database.GetAccounts();
             accountComboBox.DataSource = accounts;
-
         }
-
         private void confirmCreateInvestment_Click(object sender, EventArgs e)
         {
             bool valid = true;

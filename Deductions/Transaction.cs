@@ -12,7 +12,6 @@
         public string investmentName { get; }
         public string note { get; }
         public string source { get; }
-
         public Transaction(string category,
                             DateTime date,
                             DateTime lastModifiedDate,
