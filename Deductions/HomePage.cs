@@ -186,25 +186,29 @@ namespace Deductions
         {
 
             System.Diagnostics.Debug.WriteLine($" deleting row(s)!");
-            if (this.TransactionDataGridView.SelectedRows.Count > 0)
+            if (TransactionDataGridView.SelectedRows.Count > 0)
             {
-                List<Transaction> transactionList = new List<Transaction>();
-                foreach (DataGridViewRow row in TransactionDataGridView.SelectedRows)
+                DialogResult dialogResult = MessageBox.Show($"Are you sure you wish to delete the selected {TransactionDataGridView.SelectedRows.Count} transactions?", "Delete Selected Rows", MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.Yes)
                 {
-                    string transactionType = row.Cells[0].Value.ToString();
-                    string category = row.Cells[1].Value.ToString();
-                    double value = Double.Parse(row.Cells[2].Value.ToString());
-                    DateTime date = ((DateTimeOffset)DateTime.Parse(row.Cells[3].Value.ToString())).UtcDateTime;
-                    int financialYear = int.Parse(row.Cells[4].Value.ToString());
-                    DateTime lastModifiedDate = ((DateTimeOffset)DateTime.Parse(row.Cells[5].Value.ToString())).UtcDateTime;
-                    string selectedInvestment = row.Cells[6].Value.ToString();
-                    string note = row.Cells[7].Value.ToString();
-                    string source = row.Cells[8].Value.ToString();
-                    transactionList.Add(new Transaction(category, date, lastModifiedDate, value, transactionType, financialYear, selectedInvestment, note, source));
+                    List<Transaction> transactionList = new List<Transaction>();
+                    foreach (DataGridViewRow row in TransactionDataGridView.SelectedRows)
+                    {
+                        string transactionType = row.Cells[0].Value.ToString();
+                        string category = row.Cells[1].Value.ToString();
+                        double value = Double.Parse(row.Cells[2].Value.ToString());
+                        DateTime date = ((DateTimeOffset)DateTime.Parse(row.Cells[3].Value.ToString())).UtcDateTime;
+                        int financialYear = int.Parse(row.Cells[4].Value.ToString());
+                        DateTime lastModifiedDate = ((DateTimeOffset)DateTime.Parse(row.Cells[5].Value.ToString())).UtcDateTime;
+                        string selectedInvestment = row.Cells[6].Value.ToString();
+                        string note = row.Cells[7].Value.ToString();
+                        string source = row.Cells[8].Value.ToString();
+                        transactionList.Add(new Transaction(category, date, lastModifiedDate, value, transactionType, financialYear, selectedInvestment, note, source));
 
+                    }
+                    Database.DeleteTransactions(transactionList);
+                    LoadData();
                 }
-                Database.DeleteTransactions(transactionList);
-                LoadData();
             }
         }
         private void DisplayTransactions()
