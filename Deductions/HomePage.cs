@@ -100,7 +100,7 @@ namespace Deductions
                         InvestmentName TEXT NOT NULL,
                         Note TEXT NOT NULL,
                         Source TEXT NOT NULL,
-                        PRIMARY KEY (Category, Date, Value, TransactionType, InvestmentName),
+                        PRIMARY KEY (Category, Date, InvestmentName),
                         FOREIGN KEY (Source) REFERENCES Sources (Source),
                         FOREIGN KEY (InvestmentName) REFERENCES Investments (InvestmentName)
                         );
@@ -368,7 +368,7 @@ namespace Deductions
                         }
 
                     }
-                    Database.CreateNewTransactions(transactions);
+                    Database.UpsertTransactions(transactions);
                     LoadData();
 
                 }

@@ -239,7 +239,7 @@ namespace Deductions
                 return;
             }
         }
-        internal static void CreateNewTransactions(List<Transaction> transactions)
+        internal static void UpsertTransactions(List<Transaction> transactions)
         {
             using (SQLiteConnection conn = CreateConnection())
             {
@@ -249,7 +249,15 @@ namespace Deductions
                     createCommand.CommandText =
                         @"
                         INSERT INTO Transactions (Category, InvestmentName, Value, Date, LastModifiedDate, TransactionType, FinancialYear, Note, Source)
-                        VALUES (@Category, @investmentName, @value, @Date, @LastModifiedDate, @transactionType, @FinancialYear, @note, '');
+                        VALUES (@Category, @investmentName, @value, @Date, @LastModifiedDate, @transactionType, @FinancialYear, @note, '')
+                        ON CONFLICT(Category, Date, InvestmentName)
+                        DO UPDATE
+                        SET 
+                            Value=@value,
+                            LastModifiedDate=@LastModifiedDate, 
+                            TransactionType=@transactionType, 
+                            Note=@note,         
+                            Source='';
                     ";
                     createCommand.Parameters.AddWithValue("@Category", transaction.category);
                     createCommand.Parameters.AddWithValue("@investmentName", transaction.investmentName);
