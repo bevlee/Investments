@@ -225,12 +225,12 @@ namespace Deductions
 
             // reload the selected dates
             allDates = new HashSet<string>(["All"]);
-            foreach (Transaction transaction in allTransactions)
+            List<string> years = Database.getAllFinancialYears(selectedInvestment);
+            foreach (string year in years)
             {
-                allDates.Add(transaction.financialYear.ToString());
+                allDates.Add(year);
             }
-            List<string> dates = new List<string>(allDates);
-            FinancialYearComboBox.DataSource = dates;
+            FinancialYearComboBox.DataSource = new List<string>(allDates);
             FinancialYearComboBox.SelectedItem = financialYearString;
 
             NetValueLabel.Text = $"The net value for investment {selectedInvestment} is {netValue}";

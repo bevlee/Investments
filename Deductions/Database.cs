@@ -49,6 +49,34 @@ namespace Deductions
             }
             return investments;
         }
+
+        public static List<string> getAllFinancialYears(string investmentName)
+        {
+            HashSet<string> years = new HashSet<string>();
+
+            using (SQLiteConnection conn = CreateConnection())
+            {
+
+                var command = conn.CreateCommand();
+                command.CommandText =
+                    @"
+                    SELECT FinancialYear
+                    FROM Transactions
+                    WHERE InvestmentName=@investmentName
+                    ORDER BY FinancialYear;
+                    ";
+                command.Parameters.AddWithValue("@investmentName", investmentName);
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var year = reader.GetInt16(0);
+                        years.Add(year.ToString());
+                    }
+                }
+            }
+            return new List<string>(years);
+        }
         public static List<(string, string)> getAllInvestmentsAndAccounts()
         {
             List<(string, string)> investments = new List<(string, string)>();
