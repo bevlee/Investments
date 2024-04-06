@@ -4,7 +4,7 @@
     {
         public string investmentName { get; }
         public DateTime date { get; }
-        public string item { get; }
+        public string category { get; }
         public decimal amount { get; set; }
         public string TransactionType { get; }
         public int financialYear { get; }
@@ -21,9 +21,9 @@
                             string note,
                             string source)
         {
-            this.item = category;
+            this.category = category;
             this.TransactionType = TransactionType;
-            this.date = date;
+            this.date = date.Date;
             this.lastModifiedDate = lastModifiedDate;
             this.amount = amount;
             this.financialYear = financialYear;

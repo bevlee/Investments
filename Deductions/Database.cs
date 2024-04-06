@@ -253,7 +253,7 @@ namespace Deductions
                         INSERT INTO Transactions (Category, InvestmentName, Value, Date, LastModifiedDate, TransactionType, FinancialYear, Note, Source)
                         VALUES (@Category, @investmentName, @value, @Date, @LastModifiedDate, @transactionType, @FinancialYear, @note, '');
                     ";
-                createCommand.Parameters.AddWithValue("@Category", transaction.item);
+                createCommand.Parameters.AddWithValue("@Category", transaction.category);
                 createCommand.Parameters.AddWithValue("@investmentName", transaction.investmentName);
                 createCommand.Parameters.AddWithValue("@value", transaction.amount);
                 createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.date).ToUnixTimeSeconds());
@@ -287,7 +287,7 @@ namespace Deductions
                             Note=@note,         
                             Source='';
                     ";
-                    createCommand.Parameters.AddWithValue("@Category", transaction.item);
+                    createCommand.Parameters.AddWithValue("@Category", transaction.category);
                     createCommand.Parameters.AddWithValue("@investmentName", transaction.investmentName);
                     createCommand.Parameters.AddWithValue("@value", transaction.amount);
                     createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.date).ToUnixTimeSeconds());
@@ -331,7 +331,7 @@ namespace Deductions
                         AND Date = @Date
                         AND TransactionType = @transactionType;
                     ";
-                    createCommand.Parameters.AddWithValue("@Category", transaction.item);
+                    createCommand.Parameters.AddWithValue("@Category", transaction.category);
                     createCommand.Parameters.AddWithValue("@investmentName", transaction.investmentName);
                     createCommand.Parameters.AddWithValue("@value", transaction.amount);
                     createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.date).ToUnixTimeSeconds());

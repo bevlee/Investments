@@ -137,12 +137,12 @@ namespace Deductions
                     @"
                         INSERT INTO Transactions (Category, InvestmentName, Value, Date, LastModifiedDate, Note, TransactionType, FinancialYear, Source)
                         VALUES 
-                            ('Rent', 'Test', 1500, 1706679357, $currentDate, '', 'Income', '2024', ''),
-                            ('Rent', 'Test', 1500, 1709184957, $currentDate, '', 'Income', '2024', ''),
-                            ('Cleaning Costs', 'Test', 950, 1707973200, $currentDate, 'End of lease cleaning', 'Expense', '2024', ''),
-                            ('Water', 'Test', 122.11, 1707973200, $currentDate, '', 'Expense', '2024', ''),
-                            ('Gas', 'Test', 57.29, 1707973200, $currentDate, '', 'Expense', '2024', ''),
-                            ('Electricity', 'Test', 259.35, 1707973200, $currentDate, '', 'Expense', '2024', '');
+                            ('Rent', 'Test', 1500, 1706792400, $currentDate, '', 'Income', '2024', ''),
+                            ('Rent', 'Test', 1500, 1707915600, $currentDate, '', 'Income', '2024', ''),
+                            ('Cleaning Costs', 'Test', 950, 1712322000, $currentDate, 'End of lease cleaning', 'Expense', '2024', ''),
+                            ('Water', 'Test', 122.11, 1712322000, $currentDate, '', 'Expense', '2024', ''),
+                            ('Gas', 'Test', 57.29, 1712322000, $currentDate, '', 'Expense', '2024', ''),
+                            ('Electricity', 'Test', 259.35, 1707955200, $currentDate, '', 'Expense', '2024', '');
                     ";
                     command.Parameters.AddWithValue("$currentDate", DateTimeOffset.UtcNow.ToUnixTimeSeconds());
                     command.ExecuteNonQuery();
@@ -435,11 +435,11 @@ namespace Deductions
                 table.AddCell("Category");
                 table.AddCell("Expense");
                 table.AddCell("Income");
-                foreach (Tuple<string, string, decimal> item in categorySummary)
+                foreach (Tuple<string, string, decimal> category in categorySummary)
                 {
-                    table.AddCell(item.Item1);
-                    table.AddCell(item.Item2 == "Expense" ? item.Item3.ToString() : "");
-                    table.AddCell(item.Item2 == "Expense" ? "" : item.Item3.ToString());
+                    table.AddCell(category.Item1);
+                    table.AddCell(category.Item2 == "Expense" ? category.Item3.ToString() : "");
+                    table.AddCell(category.Item2 == "Expense" ? "" : category.Item3.ToString());
                 }
                 table.AddCell("Total");
                 table.AddCell(new Cell(1, 2).Add(new Paragraph(totalString)));
