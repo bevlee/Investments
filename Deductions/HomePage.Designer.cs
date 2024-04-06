@@ -119,6 +119,7 @@ namespace Deductions
             createAccountButton.TabIndex = 6;
             createAccountButton.Text = "Create Account";
             createAccountButton.UseVisualStyleBackColor = false;
+            createAccountButton.Visible = false;
             // 
             // TransactionDataGridView
             // 

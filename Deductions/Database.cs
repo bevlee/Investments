@@ -177,7 +177,7 @@ namespace Deductions
                         string Category = reader.GetString(0);
                         DateTime date = UnixTimeStampToDateTime(reader.GetInt64(1));
                         DateTime lastModifiedDate = UnixTimeStampToDateTime(reader.GetInt64(2));
-                        double value = reader.GetDouble(3);
+                        decimal value = reader.GetDecimal(3);
                         string transactionType = reader.GetString(4);
                         fy = reader.GetInt32(5);
                         string note = reader.GetString(6);
@@ -253,7 +253,7 @@ namespace Deductions
                         INSERT INTO Transactions (Category, InvestmentName, Value, Date, LastModifiedDate, TransactionType, FinancialYear, Note, Source)
                         VALUES (@Category, @investmentName, @value, @Date, @LastModifiedDate, @transactionType, @FinancialYear, @note, '');
                     ";
-                createCommand.Parameters.AddWithValue("@Category", transaction.category);
+                createCommand.Parameters.AddWithValue("@Category", transaction.item);
                 createCommand.Parameters.AddWithValue("@investmentName", transaction.investmentName);
                 createCommand.Parameters.AddWithValue("@value", transaction.amount);
                 createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.date).ToUnixTimeSeconds());
@@ -287,7 +287,7 @@ namespace Deductions
                             Note=@note,         
                             Source='';
                     ";
-                    createCommand.Parameters.AddWithValue("@Category", transaction.category);
+                    createCommand.Parameters.AddWithValue("@Category", transaction.item);
                     createCommand.Parameters.AddWithValue("@investmentName", transaction.investmentName);
                     createCommand.Parameters.AddWithValue("@value", transaction.amount);
                     createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.date).ToUnixTimeSeconds());
@@ -331,7 +331,7 @@ namespace Deductions
                         AND Date = @Date
                         AND TransactionType = @transactionType;
                     ";
-                    createCommand.Parameters.AddWithValue("@Category", transaction.category);
+                    createCommand.Parameters.AddWithValue("@Category", transaction.item);
                     createCommand.Parameters.AddWithValue("@investmentName", transaction.investmentName);
                     createCommand.Parameters.AddWithValue("@value", transaction.amount);
                     createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.date).ToUnixTimeSeconds());
@@ -361,9 +361,9 @@ namespace Deductions
             }
         }
 
-        public static List<Tuple<string, string, double>> getSummary(string accountName, string investmentName, string financialYear)
+        public static List<Tuple<string, string, decimal>> getSummary(string accountName, string investmentName, string financialYear)
         {
-            List<Tuple<string, string, double>> CategorySummary = new List<Tuple<string, string, double>>();
+            List<Tuple<string, string, decimal>> CategorySummary = new List<Tuple<string, string, decimal>>();
 
             using (SQLiteConnection conn = CreateConnection())
             {
@@ -403,9 +403,9 @@ namespace Deductions
                     {
                         string Category = reader.GetString(0);
                         string transactionType = reader.GetString(1);
-                        double value = reader.GetDouble(2);
+                        decimal value = reader.GetDecimal(2);
 
-                        CategorySummary.Add(new Tuple<string, string, double>(Category, transactionType, value));
+                        CategorySummary.Add(new Tuple<string, string, decimal>(Category, transactionType, value));
 
                     }
                 }

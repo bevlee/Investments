@@ -39,7 +39,7 @@
         {
             
             bool valid = true;
-            double value;
+            decimal value;
             if (TransactionTypeComboBox.Text == null)
             {
                 valid = false;
@@ -60,7 +60,7 @@
 
                 categoryTextBox.BackColor = Color.White;
             }
-            if (Double.TryParse(TransactionValueTextBox.Text, out value))
+            if (Decimal.TryParse(TransactionValueTextBox.Text, out value))
             {
                 TransactionValueTextBox.BackColor = Color.White;
             }

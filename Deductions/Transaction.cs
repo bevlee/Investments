@@ -2,27 +2,26 @@
 {
     internal class Transaction
     {
-        public string TransactionType { get; }
-        public string category { get; }
-        public Double amount { get; set; }
+        public string investmentName { get; }
         public DateTime date { get; }
+        public string item { get; }
+        public decimal amount { get; set; }
+        public string TransactionType { get; }
         public int financialYear { get; }
         public DateTime lastModifiedDate { get; }
-        
-        public string investmentName { get; }
         public string note { get; }
         public string source { get; }
         public Transaction(string category,
                             DateTime date,
                             DateTime lastModifiedDate,
-                            Double amount,
+                            decimal amount,
                             string TransactionType,
                             int financialYear,
                             string investmentName,
                             string note,
                             string source)
         {
-            this.category = category;
+            this.item = category;
             this.TransactionType = TransactionType;
             this.date = date;
             this.lastModifiedDate = lastModifiedDate;

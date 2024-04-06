@@ -196,7 +196,7 @@ namespace Deductions
                     {
                         string transactionType = row.Cells[0].Value.ToString();
                         string category = row.Cells[1].Value.ToString();
-                        double value = Double.Parse(row.Cells[2].Value.ToString());
+                        decimal value = decimal.Parse(row.Cells[2].Value.ToString());
                         DateTime date = ((DateTimeOffset)DateTime.Parse(row.Cells[3].Value.ToString())).UtcDateTime;
                         int financialYear = int.Parse(row.Cells[4].Value.ToString());
                         DateTime lastModifiedDate = ((DateTimeOffset)DateTime.Parse(row.Cells[5].Value.ToString())).UtcDateTime;
@@ -213,9 +213,9 @@ namespace Deductions
         }
         private void DisplayTransactions()
         {
-            System.Diagnostics.Debug.WriteLine($" displaying transactions!");
+            //System.Diagnostics.Debug.WriteLine($" displaying transactions!");
             List<Transaction> allTransactions = Database.LoadTransactions(selectedInvestment, financialYearString);
-            double netValue = 0;
+            decimal netValue = 0;
             allTransactions.ForEach(transaction =>
             {
                 netValue += transaction.TransactionType == "Income" ? transaction.amount : -transaction.amount;
@@ -327,7 +327,7 @@ namespace Deductions
             string TransactionType;
             DateTime date;
             DateTime lastModifiedDate = DateTime.UtcNow;
-            double amount;
+            decimal amount;
             int financialYear;
             string investmentName = selectedInvestment;
             string note = "";
@@ -353,7 +353,7 @@ namespace Deductions
                                 category = csv[3];
                                 TransactionType = csv[1];
                                 date = DateTime.Parse(csv[0]);
-                                amount = double.Parse(csv[2]);
+                                amount = decimal.Parse(csv[2]);
                                 financialYear = Database.ToFinancialYear(date);
                                 if (headers.Length > 4 && headers[4] == "note")
                                 {
@@ -389,25 +389,25 @@ namespace Deductions
 
         private void generateReportButton_Click(object sender, EventArgs e)
         {
-            List<Tuple<string, string, double>> categorySummary = Database.getSummary(accountName, selectedInvestment, financialYearString);
+            List<Tuple<string, string, decimal>> categorySummary = Database.getSummary(accountName, selectedInvestment, financialYearString);
             //System.Diagnostics.Debug.WriteLine($" \"{headers[i]} = {csv[i]}\",\r\n");
-            List<Tuple<string, double>> expenses = new List<Tuple<string, double>>();
-            List<Tuple<string, double>> income = new List<Tuple<string, double>>();
-            foreach (Tuple<string, string, double> category in categorySummary)
+            List<Tuple<string, decimal>> expenses = new List<Tuple<string, decimal>>();
+            List<Tuple<string, decimal>> income = new List<Tuple<string, decimal>>();
+            foreach (Tuple<string, string, decimal> category in categorySummary)
             {
                 System.Diagnostics.Debug.WriteLine($" \"{category.Item1} = {category.Item3}\",\r\n");
                 if (category.Item2 == "Expense")
                 {
-                    expenses.Add(new Tuple<string, double>(category.Item1, category.Item3));
+                    expenses.Add(new Tuple<string, decimal>(category.Item1, category.Item3));
                 }
                 else
                 {
-                    income.Add(new Tuple<string, double>(category.Item1, category.Item3));
+                    income.Add(new Tuple<string, decimal>(category.Item1, category.Item3));
                 }
             }
-            double incomeTotal = income.Sum(x => x.Item2);
-            double expensesTotal = expenses.Sum(x => x.Item2);
-            double total = Math.Round(incomeTotal - expensesTotal, 2, MidpointRounding.AwayFromZero);
+            decimal incomeTotal = income.Sum(x => x.Item2);
+            decimal expensesTotal = expenses.Sum(x => x.Item2);
+            decimal total = Math.Round(incomeTotal - expensesTotal, 2, MidpointRounding.AwayFromZero);
             string totalString = total > 0 ? "$" + total : "-$" + total * -1;
 
             Stream myStream;
@@ -435,7 +435,7 @@ namespace Deductions
                 table.AddCell("Category");
                 table.AddCell("Expense");
                 table.AddCell("Income");
-                foreach (Tuple<string, string, double> item in categorySummary)
+                foreach (Tuple<string, string, decimal> item in categorySummary)
                 {
                     table.AddCell(item.Item1);
                     table.AddCell(item.Item2 == "Expense" ? item.Item3.ToString() : "");
