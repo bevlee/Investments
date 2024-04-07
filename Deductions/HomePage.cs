@@ -350,20 +350,27 @@ namespace Deductions
                         {
                             while (csv.ReadNextRecord())
                             {
-                                category = csv[3];
-                                TransactionType = csv[1];
-                                date = DateTime.Parse(csv[0]);
-                                amount = decimal.Parse(csv[2]);
-                                financialYear = Database.ToFinancialYear(date);
-                                if (headers.Length > 4 && headers[4] == "note")
+                                if (csv.MaxQuotedFieldLength < 4)
                                 {
-                                    note = csv[4];
-                                }
-                                transaction = new Transaction(category, date, lastModifiedDate, amount, TransactionType, financialYear, investmentName, note, source);
-                                //System.Diagnostics.Debug.WriteLine($" \"{headers[i]} = {csv[i]}\",\r\n");
-                                transactions.Add(transaction);
 
-                                System.Diagnostics.Debug.WriteLine("");
+                                } else
+                                {
+                                    category = csv[3];
+                                    TransactionType = csv[1];
+                                    date = DateTime.Parse(csv[0]);
+                                    amount = decimal.Parse(csv[2]);
+                                    financialYear = Database.ToFinancialYear(date);
+                                    if (headers.Length > 4 && headers[4] == "note")
+                                    {
+                                        note = csv[4];
+                                    }
+                                    transaction = new Transaction(category, date, lastModifiedDate, amount, TransactionType, financialYear, investmentName, note, source);
+                                    //System.Diagnostics.Debug.WriteLine($" \"{headers[i]} = {csv[i]}\",\r\n");
+                                    transactions.Add(transaction);
+
+                                    System.Diagnostics.Debug.WriteLine("");
+                                }
+                               
                             }
                         }
                         else
