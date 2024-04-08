@@ -31,5 +31,10 @@
             this.note = note;
             this.source = source;
         }
+        public override string ToString()
+
+        {
+            return $"Investment: {investmentName}\n date: {date}\ncategory: {category}\namount: {amount}\nTransactionType: {TransactionType}\n financialYear: {financialYear}\n lastModifiedDate: {lastModifiedDate}\n note: {note}\n source: {source}\n";
+        }
     }
 }
