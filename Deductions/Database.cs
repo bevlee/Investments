@@ -290,7 +290,7 @@ namespace Deductions
                     createCommand.Parameters.AddWithValue("@Category", transaction.category);
                     createCommand.Parameters.AddWithValue("@investmentName", transaction.investmentName);
                     createCommand.Parameters.AddWithValue("@value", transaction.amount);
-                    createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.date).ToUnixTimeSeconds());
+                    createCommand.Parameters.AddWithValue("@Date", transaction.date.Ticks);
                     createCommand.Parameters.AddWithValue("@LastModifiedDate", ((DateTimeOffset)transaction.lastModifiedDate).ToUnixTimeSeconds());
                     createCommand.Parameters.AddWithValue("@transactionType", transaction.TransactionType);
                     createCommand.Parameters.AddWithValue("@note", transaction.note);

@@ -144,7 +144,7 @@ namespace Deductions
                             ('Gas', 'Test', 57.29, 1712322000, $currentDate, '', 'Expense', '2024', ''),
                             ('Electricity', 'Test', 259.35, 1707955200, $currentDate, '', 'Expense', '2024', '');
                     ";
-                    command.Parameters.AddWithValue("$currentDate", DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+                    command.Parameters.AddWithValue("$currentDate", DateTimeOffset.Now.ToUnixTimeSeconds());
                     command.ExecuteNonQuery();
                 }
             }
@@ -194,13 +194,13 @@ namespace Deductions
                     List<Transaction> transactionList = new List<Transaction>();
                     foreach (DataGridViewRow row in TransactionDataGridView.SelectedRows)
                     {
-                        string transactionType = row.Cells[0].Value.ToString();
-                        string category = row.Cells[1].Value.ToString();
-                        decimal value = decimal.Parse(row.Cells[2].Value.ToString());
-                        DateTime date = ((DateTimeOffset)DateTime.Parse(row.Cells[3].Value.ToString())).UtcDateTime;
-                        int financialYear = int.Parse(row.Cells[4].Value.ToString());
-                        DateTime lastModifiedDate = ((DateTimeOffset)DateTime.Parse(row.Cells[5].Value.ToString())).UtcDateTime;
-                        string selectedInvestment = row.Cells[6].Value.ToString();
+                        string selectedInvestment = row.Cells[0].Value.ToString();
+                        DateTime date = DateTime.Parse(row.Cells[1].Value.ToString());
+                        string category = row.Cells[2].Value.ToString();
+                        decimal value = decimal.Parse(row.Cells[3].Value.ToString());
+                        string transactionType = row.Cells[4].Value.ToString();
+                        int financialYear = int.Parse(row.Cells[5].Value.ToString());
+                        DateTime lastModifiedDate = DateTime.Parse(row.Cells[6].Value.ToString());
                         string note = row.Cells[7].Value.ToString();
                         string source = row.Cells[8].Value.ToString();
                         transactionList.Add(new Transaction(category, date, lastModifiedDate, value, transactionType, financialYear, selectedInvestment, note, source));
@@ -326,7 +326,7 @@ namespace Deductions
             string category;
             string TransactionType;
             DateTime date;
-            DateTime lastModifiedDate = DateTime.UtcNow;
+            DateTime lastModifiedDate = DateTime.Now;
             decimal amount;
             int financialYear;
             string investmentName = selectedInvestment;
@@ -343,18 +343,13 @@ namespace Deductions
                 {
                     using (CsvReader csv = new CsvReader(new StreamReader(fileName), true))
                     {
-                        csv.MissingFieldAction = MissingFieldAction.ReplaceByEmpty;
+                        //csv.MissingFieldAction = MissingFieldAction.ReplaceByEmpty;
                         int fieldCount = csv.FieldCount;
                         string[] headers = csv.GetFieldHeaders();
                         if (mandatoryFields.All(headers.Contains))
                         {
                             while (csv.ReadNextRecord())
                             {
-                                if (csv.MaxQuotedFieldLength < 4)
-                                {
-
-                                } else
-                                {
                                     category = csv[3];
                                     TransactionType = csv[1];
                                     date = DateTime.Parse(csv[0]);
@@ -368,8 +363,8 @@ namespace Deductions
                                     //System.Diagnostics.Debug.WriteLine($" \"{headers[i]} = {csv[i]}\",\r\n");
                                     transactions.Add(transaction);
 
-                                    System.Diagnostics.Debug.WriteLine("");
-                                }
+                                    System.Diagnostics.Debug.WriteLine(transaction.ToString());
+                                
                                
                             }
                         }
