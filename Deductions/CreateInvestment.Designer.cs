@@ -40,7 +40,7 @@
             confirmCreateInvestment.Location = new Point(241, 348);
             confirmCreateInvestment.Name = "confirmCreateInvestment";
             confirmCreateInvestment.Size = new Size(75, 23);
-            confirmCreateInvestment.TabIndex = 0;
+            confirmCreateInvestment.TabIndex = 2;
             confirmCreateInvestment.Text = "Create";
             confirmCreateInvestment.UseVisualStyleBackColor = true;
             confirmCreateInvestment.Click += confirmCreateInvestment_Click;
@@ -59,7 +59,7 @@
             InvestmentName_Textbox.Location = new Point(179, 110);
             InvestmentName_Textbox.Name = "InvestmentName_Textbox";
             InvestmentName_Textbox.Size = new Size(272, 23);
-            InvestmentName_Textbox.TabIndex = 4;
+            InvestmentName_Textbox.TabIndex = 0;
             // 
             // InvestmentName_Label
             // 
@@ -77,7 +77,7 @@
             accountComboBox.Location = new Point(179, 194);
             accountComboBox.Name = "accountComboBox";
             accountComboBox.Size = new Size(121, 23);
-            accountComboBox.TabIndex = 6;
+            accountComboBox.TabIndex = 1;
             // 
             // CreateInvestment
             // 

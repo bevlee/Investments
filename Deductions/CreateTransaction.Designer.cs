@@ -48,7 +48,7 @@
             createTransactionButton.Location = new Point(190, 514);
             createTransactionButton.Name = "createTransactionButton";
             createTransactionButton.Size = new Size(75, 23);
-            createTransactionButton.TabIndex = 5;
+            createTransactionButton.TabIndex = 2;
             createTransactionButton.Text = "Create";
             createTransactionButton.UseVisualStyleBackColor = true;
             createTransactionButton.Click += createTransactionButton_Click;
@@ -67,7 +67,7 @@
             TransactionValueTextBox.Location = new Point(83, 225);
             TransactionValueTextBox.Name = "TransactionValueTextBox";
             TransactionValueTextBox.Size = new Size(272, 23);
-            TransactionValueTextBox.TabIndex = 2;
+            TransactionValueTextBox.TabIndex = 1;
             // 
             // investmentComboBox
             // 
@@ -76,7 +76,7 @@
             investmentComboBox.Location = new Point(83, 79);
             investmentComboBox.Name = "investmentComboBox";
             investmentComboBox.Size = new Size(272, 23);
-            investmentComboBox.TabIndex = 0;
+            investmentComboBox.TabIndex = 3;
             // 
             // categoryLabel
             // 
@@ -92,7 +92,7 @@
             categoryTextBox.Location = new Point(83, 158);
             categoryTextBox.Name = "categoryTextBox";
             categoryTextBox.Size = new Size(272, 23);
-            categoryTextBox.TabIndex = 1;
+            categoryTextBox.TabIndex = 0;
             // 
             // InvestmentLabel
             // 
