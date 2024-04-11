@@ -290,12 +290,12 @@ namespace Deductions
                 _sortDirection ^= true; // toggle direction
 
             TransactionDataGridView.DataSource = SortData(
-                (List<Transaction>)TransactionDataGridView.DataSource, TransactionDataGridView.Columns[e.ColumnIndex].Name, _sortDirection);
+                (List<TransactionDisplay>)TransactionDataGridView.DataSource, TransactionDataGridView.Columns[e.ColumnIndex].Name, _sortDirection);
 
             _previousIndex = e.ColumnIndex;
         }
 
-        private List<Transaction> SortData(List<Transaction> list, string column, bool ascending)
+        private List<TransactionDisplay> SortData(List<TransactionDisplay> list, string column, bool ascending)
         {
             return ascending ?
                 list.OrderBy(_ => _.GetType().GetProperty(column).GetValue(_)).ToList() :
