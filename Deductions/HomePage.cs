@@ -220,8 +220,9 @@ namespace Deductions
             {
                 netValue += transaction.TransactionType == "Income" ? transaction.amount : -transaction.amount;
             });
-
-            TransactionDataGridView.DataSource = allTransactions;
+            //List<TransactionDisplay> transactionDisplays = new List<TransactionDisplay>();
+            var transactionDisplays = allTransactions.Select(transaction => new TransactionDisplay(transaction)).ToList();
+            TransactionDataGridView.DataSource = transactionDisplays;
 
             // reload the selected dates
             allDates = new HashSet<string>(["All"]);

@@ -2,39 +2,39 @@
 {
     internal class TransactionDisplay
     {
-        public string date { get; }
-        public string item { get; }
-        public string amount { get; set; }
+        public DateTime Date { get; }
+        public string Item { get; }
+        public string Amount { get; set; }
         public string TransactionType { get; }
-        public int financialYear { get; }
-        public DateTime lastModifiedDate { get; }
-        public string note { get; }
+        public int FinancialYear { get; }
+        public DateTime LastModifiedDate { get; }
+        public string Note { get; }
         public TransactionDisplay(string category,
-                            string date,
+                            DateTime Date,
                             DateTime lastModifiedDate,
                             decimal amount,
                             string TransactionType,
                             int financialYear,
                             string note)
         {
-            this.item = category;
+            this.Item = category;
             this.TransactionType = TransactionType;
-            this.date = date;
-            this.lastModifiedDate = lastModifiedDate;
-            this.amount = "$" + amount;
-            this.financialYear = financialYear;
-            this.note = note;
+            this.Date = Date.Date;
+            this.LastModifiedDate = lastModifiedDate;
+            this.Amount = "$" + amount;
+            this.FinancialYear = financialYear;
+            this.Note = note;
         }
 
         public TransactionDisplay(Transaction transaction)
         {
-            this.item = transaction.category;
+            this.Item = transaction.category;
             this.TransactionType = transaction.TransactionType;
-            this.date = transaction.date.Date.ToString();
-            this.lastModifiedDate = transaction.lastModifiedDate;
-            this.amount = "$" + transaction.amount;
-            this.financialYear = transaction.financialYear;
-            this.note = transaction.note;
+            this.Date = transaction.date.Date;
+            this.LastModifiedDate = transaction.lastModifiedDate;
+            this.Amount = "$" + transaction.amount;
+            this.FinancialYear = transaction.financialYear;
+            this.Note = transaction.note;
         }
     }
 }
