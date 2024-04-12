@@ -1,4 +1,5 @@
 ﻿using System.Data.SQLite;
+using System.Transactions;
 
 namespace Deductions
 {
@@ -49,7 +50,6 @@ namespace Deductions
             }
             return investments;
         }
-
         public static List<string> getAllFinancialYears(string investmentName)
         {
             HashSet<string> years = new HashSet<string>();
@@ -76,6 +76,32 @@ namespace Deductions
                 }
             }
             return new List<string>(years);
+        }
+        public static DateTime getOldestTransaction(string investmentName)
+        {
+            DateTime oldestTransactionDate = DateTime.MinValue;
+
+            using (SQLiteConnection conn = CreateConnection())
+            {
+
+                var command = conn.CreateCommand();
+                command.CommandText =
+                    @"
+                    SELECT Date
+                    FROM Transactions
+                    WHERE InvestmentName=@investmentName
+                    ORDER BY Date ASC LIMIT 1;
+                    ";
+                command.Parameters.AddWithValue("@investmentName", investmentName);
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        oldestTransactionDate = UnixTimeStampToDateTime(reader.GetInt64(0));
+                    }
+                }
+            }
+            return oldestTransactionDate;
         }
         public static List<(string, string)> getAllInvestmentsAndAccounts()
         {
@@ -174,6 +200,53 @@ namespace Deductions
                     while (reader.Read())
                     {
 
+                        string Category = reader.GetString(0);
+                        DateTime date = UnixTimeStampToDateTime(reader.GetInt64(1));
+                        DateTime lastModifiedDate = UnixTimeStampToDateTime(reader.GetInt64(2));
+                        decimal value = reader.GetDecimal(3);
+                        string transactionType = reader.GetString(4);
+                        fy = reader.GetInt32(5);
+                        string note = reader.GetString(6);
+                        string source = reader.GetString(7);
+
+                        transaction = new Transaction(Category, date, lastModifiedDate, value, transactionType, fy, investmentName, note, source);
+                        transactions.Add(transaction);
+
+                    }
+                }
+
+            }
+            return transactions;
+        }
+
+        internal static List<Transaction> LoadTransactions(string investmentName, DateTime startDate, DateTime endDate)
+        {
+
+            List<Transaction> transactions = new List<Transaction>();
+            using (SQLiteConnection conn = CreateConnection())
+            {
+                var command = conn.CreateCommand();
+                int fy;
+                System.Diagnostics.Debug.WriteLine($" loading transactions");
+               
+                System.Diagnostics.Debug.WriteLine($" start date {startDate} to end date {endDate} ");
+                command.CommandText =
+                @"
+                SELECT Category, Date, LastModifiedDate, Value, TransactionType, FinancialYear, Note, Source
+                FROM Transactions
+                WHERE InvestmentName = @investmentName
+                AND @startDate <= Date
+                AND @endDate >= Date;
+                ";
+                command.Parameters.AddWithValue("@startDate", ((DateTimeOffset) startDate).ToUnixTimeSeconds());
+                command.Parameters.AddWithValue("@endDate", ((DateTimeOffset) endDate).ToUnixTimeSeconds());
+                command.Parameters.AddWithValue("@investmentName", investmentName);
+
+                using (var reader = command.ExecuteReader())
+                {
+                    Transaction? transaction = null;
+                    while (reader.Read())
+                    {
                         string Category = reader.GetString(0);
                         DateTime date = UnixTimeStampToDateTime(reader.GetInt64(1));
                         DateTime lastModifiedDate = UnixTimeStampToDateTime(reader.GetInt64(2));

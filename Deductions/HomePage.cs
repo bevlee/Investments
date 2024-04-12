@@ -13,15 +13,19 @@ namespace Deductions
     {
         private string accountName;
         private string? selectedInvestment = null;
-        private string financialYearString = "All";
+        private string financialYearString = "";
+        private DateTime oldestTransactionDate = DateTime.UnixEpoch;
         private HashSet<string> allDates;
         private string[] mandatoryFields = ["Category", "TransactionType", "Amount", "Date"];
+        private bool fyChanged = true;
+        
 
         public HomePage()
         {
             InitializeComponent();
             InitDb();
             LoadData();
+            fromDatePicker.MaxDate = DateTime.Now;
         }
         private void InitDb()
         {
@@ -214,19 +218,35 @@ namespace Deductions
         private void DisplayTransactions()
         {
             //System.Diagnostics.Debug.WriteLine($" displaying transactions!");
-            List<Transaction> allTransactions = Database.LoadTransactions(selectedInvestment, financialYearString);
+
+            List<Transaction> allTransactions;
+            if (fyChanged)
+            {
+                allTransactions = Database.LoadTransactions(selectedInvestment, financialYearString);
+            }
+            else
+            {
+                allTransactions = Database.LoadTransactions(selectedInvestment, fromDatePicker.Value, toDatePicker.Value);
+            }
+            fyChanged = false;
+
             decimal netValue = 0;
             allTransactions.ForEach(transaction =>
             {
                 netValue += transaction.TransactionType == "Income" ? transaction.amount : -transaction.amount;
             });
+            string netValueString = netValue < 0 ? "-$" + Math.Abs(netValue) : "$" + netValue;
             //List<TransactionDisplay> transactionDisplays = new List<TransactionDisplay>();
             var transactionDisplays = allTransactions.Select(transaction => new TransactionDisplay(transaction)).ToList();
             TransactionDataGridView.DataSource = transactionDisplays;
 
             // reload the selected dates
-            allDates = new HashSet<string>(["All"]);
+            allDates = new HashSet<string>([""]);
             List<string> years = Database.getAllFinancialYears(selectedInvestment);
+            oldestTransactionDate = Database.getOldestTransaction(selectedInvestment);
+            fromDatePicker.MinDate = oldestTransactionDate;
+            fromDatePicker.Value = oldestTransactionDate.Date < DateTime.UnixEpoch ? oldestTransactionDate : fromDatePicker.Value;
+            toDatePicker.MinDate = oldestTransactionDate;
             foreach (string year in years)
             {
                 allDates.Add(year);
@@ -234,7 +254,7 @@ namespace Deductions
             FinancialYearComboBox.DataSource = new List<string>(allDates);
             FinancialYearComboBox.SelectedItem = financialYearString;
 
-            NetValueLabel.Text = $"The net value for investment {selectedInvestment} is {netValue}";
+            NetValueLabel.Text = $"The net value for investment {selectedInvestment} is {netValueString}";
         }
 
         private void manageInvestmentsButton_Click(object sender, EventArgs e)
@@ -280,6 +300,7 @@ namespace Deductions
                 System.Diagnostics.Debug.WriteLine($" changing FY");
                 financialYearString = fy;
             }
+            fyChanged = true;
             LoadData();
         }
         private int _previousIndex;
@@ -351,22 +372,22 @@ namespace Deductions
                         {
                             while (csv.ReadNextRecord())
                             {
-                                    category = csv[3];
-                                    TransactionType = csv[1];
-                                    date = DateTime.Parse(csv[0]);
-                                    amount = decimal.Parse(csv[2]);
-                                    financialYear = Database.ToFinancialYear(date);
-                                    if (headers.Length > 4 && headers[4] == "note")
-                                    {
-                                        note = csv[4];
-                                    }
-                                    transaction = new Transaction(category, date, lastModifiedDate, amount, TransactionType, financialYear, investmentName, note, source);
-                                    //System.Diagnostics.Debug.WriteLine($" \"{headers[i]} = {csv[i]}\",\r\n");
-                                    transactions.Add(transaction);
+                                category = csv[3];
+                                TransactionType = csv[1];
+                                date = DateTime.Parse(csv[0]);
+                                amount = decimal.Parse(csv[2]);
+                                financialYear = Database.ToFinancialYear(date);
+                                if (headers.Length > 4 && headers[4] == "note")
+                                {
+                                    note = csv[4];
+                                }
+                                transaction = new Transaction(category, date, lastModifiedDate, amount, TransactionType, financialYear, investmentName, note, source);
+                                //System.Diagnostics.Debug.WriteLine($" \"{headers[i]} = {csv[i]}\",\r\n");
+                                transactions.Add(transaction);
 
-                                    System.Diagnostics.Debug.WriteLine(transaction.ToString());
-                                
-                               
+                                System.Diagnostics.Debug.WriteLine(transaction.ToString());
+
+
                             }
                         }
                         else
@@ -423,7 +444,7 @@ namespace Deductions
                 PdfDocument pdfDoc = new PdfDocument(new PdfWriter(saveFileDialog.FileName));
                 Document doc = new Document(pdfDoc);
                 PdfFont code = PdfFontFactory.CreateFont(StandardFonts.COURIER);
-                
+
                 Style titleStyle = new Style()
                 .SetFont(code)
                 .SetFontSize(28)
@@ -446,11 +467,33 @@ namespace Deductions
                 }
                 table.AddCell("Total");
                 table.AddCell(new Cell(1, 2).Add(new Paragraph(totalString)));
-                
+
                 doc.Add(table);
 
                 doc.Close();
             }
+        }
+
+        private void FromDatePicker_SelectionChanged(object sender, EventArgs e)
+        {
+            LoadData();
+            FinancialYearComboBox.Text = "";
+            if (toDatePicker.Value < fromDatePicker.Value)
+            {
+                toDatePicker.Value = fromDatePicker.Value;
+            }
+            toDatePicker.MinDate = fromDatePicker.Value;
+        }
+
+        private void ToDatePicker_SelectionChanged(object sender, EventArgs e)
+        {
+            LoadData();
+            FinancialYearComboBox.Text = "";
+            if (fromDatePicker.Value >  toDatePicker.Value)
+            {
+                fromDatePicker.Value = toDatePicker.Value;
+            }
+            fromDatePicker.MaxDate = toDatePicker.Value;
         }
     }
 }

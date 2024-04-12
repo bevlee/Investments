@@ -55,6 +55,10 @@ namespace Deductions
             importCsvToolStripMenuItem = new ToolStripMenuItem();
             openFileDialog1 = new OpenFileDialog();
             generateReportButton = new Button();
+            label1 = new Label();
+            label2 = new Label();
+            fromDatePicker = new DateTimePicker();
+            toDatePicker = new DateTimePicker();
             ((System.ComponentModel.ISupportInitialize)TransactionDataGridView).BeginInit();
             menuStrip1.SuspendLayout();
             SuspendLayout();
@@ -128,10 +132,10 @@ namespace Deductions
             TransactionDataGridView.AllowUserToOrderColumns = true;
             TransactionDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             TransactionDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            TransactionDataGridView.Location = new Point(18, 141);
+            TransactionDataGridView.Location = new Point(18, 174);
             TransactionDataGridView.Name = "TransactionDataGridView";
             TransactionDataGridView.ReadOnly = true;
-            TransactionDataGridView.Size = new Size(1052, 382);
+            TransactionDataGridView.Size = new Size(1052, 349);
             TransactionDataGridView.TabIndex = 7;
             TransactionDataGridView.ColumnHeaderMouseClick += TransactionDataGridView_ColumnHeaderMouseClick;
             // 
@@ -178,7 +182,7 @@ namespace Deductions
             // DeleteButton
             // 
             DeleteButton.BackColor = Color.DarkKhaki;
-            DeleteButton.Location = new Point(1094, 141);
+            DeleteButton.Location = new Point(1086, 174);
             DeleteButton.Name = "DeleteButton";
             DeleteButton.Size = new Size(133, 49);
             DeleteButton.TabIndex = 12;
@@ -248,11 +252,56 @@ namespace Deductions
             generateReportButton.UseVisualStyleBackColor = false;
             generateReportButton.Click += generateReportButton_Click;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label1.Location = new Point(896, 40);
+            label1.Name = "label1";
+            label1.Size = new Size(47, 21);
+            label1.TabIndex = 17;
+            label1.Text = "From";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label2.Location = new Point(896, 90);
+            label2.Name = "label2";
+            label2.Size = new Size(25, 21);
+            label2.TabIndex = 18;
+            label2.Text = "To";
+            // 
+            // fromDatePicker
+            // 
+            fromDatePicker.Location = new Point(896, 64);
+            fromDatePicker.MaxDate = new DateTime(3000, 12, 31, 0, 0, 0, 0);
+            fromDatePicker.MinDate = new DateTime(1969, 12, 1, 0, 0, 0, 0);
+            fromDatePicker.Name = "fromDatePicker";
+            fromDatePicker.Size = new Size(200, 23);
+            fromDatePicker.TabIndex = 19;
+            fromDatePicker.Value = new DateTime(1969, 12, 1, 0, 0, 0, 0);
+            fromDatePicker.ValueChanged += FromDatePicker_SelectionChanged;
+            // 
+            // toDatePicker
+            // 
+            toDatePicker.Location = new Point(897, 114);
+            toDatePicker.MaxDate = new DateTime(3000, 12, 31, 0, 0, 0, 0);
+            toDatePicker.MinDate = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            toDatePicker.Name = "toDatePicker";
+            toDatePicker.Size = new Size(200, 23);
+            toDatePicker.TabIndex = 20;
+            toDatePicker.ValueChanged += ToDatePicker_SelectionChanged;
+            // 
             // HomePage
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1248, 604);
+            Controls.Add(toDatePicker);
+            Controls.Add(fromDatePicker);
+            Controls.Add(label2);
+            Controls.Add(label1);
             Controls.Add(generateReportButton);
             Controls.Add(createExpenseButton);
             Controls.Add(createIncomeButton);
@@ -300,5 +349,9 @@ namespace Deductions
         private ToolStripMenuItem importCsvToolStripMenuItem;
         private OpenFileDialog openFileDialog1;
         private Button generateReportButton;
+        private Label label1;
+        private Label label2;
+        private DateTimePicker fromDatePicker;
+        private DateTimePicker toDatePicker;
     }
 }
