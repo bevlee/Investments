@@ -7,6 +7,7 @@ using iText.Kernel.Colors;
 using iText.IO.Font.Constants;
 using iText.Kernel.Font;
 using iText.Layout.Properties;
+using System.Globalization;
 namespace Deductions
 {
     public partial class HomePage : Form
@@ -18,14 +19,14 @@ namespace Deductions
         private HashSet<string> allDates;
         private string[] mandatoryFields = ["Category", "TransactionType", "Amount", "Date"];
         private bool fyChanged = true;
-        
+        private DateTime fromDate = DateTime.UnixEpoch;
+        private DateTime toDate = DateTime.Now;
 
         public HomePage()
         {
             InitializeComponent();
             InitDb();
             LoadData();
-            fromDatePicker.MaxDate = DateTime.Now;
         }
         private void InitDb()
         {
@@ -228,7 +229,6 @@ namespace Deductions
             {
                 allTransactions = Database.LoadTransactions(selectedInvestment, fromDatePicker.Value, toDatePicker.Value);
             }
-            fyChanged = false;
 
             decimal netValue = 0;
             allTransactions.ForEach(transaction =>
@@ -244,9 +244,10 @@ namespace Deductions
             allDates = new HashSet<string>([""]);
             List<string> years = Database.getAllFinancialYears(selectedInvestment);
             oldestTransactionDate = Database.getOldestTransaction(selectedInvestment);
-            fromDatePicker.MinDate = oldestTransactionDate;
-            fromDatePicker.Value = oldestTransactionDate.Date < DateTime.UnixEpoch ? oldestTransactionDate : fromDatePicker.Value;
-            toDatePicker.MinDate = oldestTransactionDate;
+            //fromDatePicker.MinDate = oldestTransactionDate;
+            fromDate = fromDatePicker.Value < DateTime.UnixEpoch ? oldestTransactionDate : fromDatePicker.Value;
+            fromDatePicker.Value = fromDate;
+            //toDatePicker.MinDate = oldestTransactionDate;
             foreach (string year in years)
             {
                 allDates.Add(year);
@@ -254,6 +255,7 @@ namespace Deductions
             FinancialYearComboBox.DataSource = new List<string>(allDates);
             FinancialYearComboBox.SelectedItem = financialYearString;
 
+            fyChanged = false;
             NetValueLabel.Text = $"The net value for investment {selectedInvestment} is {netValueString}";
         }
 
@@ -287,22 +289,11 @@ namespace Deductions
                 selectedInvestment = investmentComboBox.SelectedItem.ToString();
 
 
-                financialYearString = "All";
+                financialYearString = "";
                 LoadData();
             }
         }
-        private void financialYearComboBox_SelectionChanged(object sender, EventArgs e)
-        {
-            //MessageBox.Show("Selected value changed to: " + investmentComboBox.SelectedItem.ToString());
-            string fy = FinancialYearComboBox.SelectedItem.ToString();
-            if (fy != financialYearString)
-            {
-                System.Diagnostics.Debug.WriteLine($" changing FY");
-                financialYearString = fy;
-            }
-            fyChanged = true;
-            LoadData();
-        }
+
         private int _previousIndex;
         private bool _sortDirection;
         private void TransactionDataGridView_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -434,7 +425,6 @@ namespace Deductions
             decimal total = Math.Round(incomeTotal - expensesTotal, 2, MidpointRounding.AwayFromZero);
             string totalString = total > 0 ? "$" + total : "-$" + total * -1;
 
-            Stream myStream;
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "pdf files | *.pdf";
             saveFileDialog.FilterIndex = 2;
@@ -450,7 +440,7 @@ namespace Deductions
                 .SetFontSize(28)
                 .SetFontColor(ColorConstants.RED)
                 .SetBackgroundColor(ColorConstants.LIGHT_GRAY);
-                Paragraph title = new Paragraph($"{(financialYearString == "All" ? "Historical" : financialYearString)} summary for {selectedInvestment}").AddStyle(titleStyle);
+                Paragraph title = new Paragraph($"{(financialYearString == "" ? "Historical" : financialYearString)} summary for {selectedInvestment}").AddStyle(titleStyle);
 
                 doc.Add(title);
 
@@ -476,24 +466,73 @@ namespace Deductions
 
         private void FromDatePicker_SelectionChanged(object sender, EventArgs e)
         {
-            LoadData();
-            FinancialYearComboBox.Text = "";
-            if (toDatePicker.Value < fromDatePicker.Value)
+            if (fromDatePicker.Value.Date != fromDate.Date && !fyChanged)
             {
-                toDatePicker.Value = fromDatePicker.Value;
+                FinancialYearComboBox.SelectedItem = "N/A";
+                FinancialYearComboBox.Text = "N/A";
+                financialYearString = "N/A";
+                if (toDatePicker.Value < fromDatePicker.Value)
+                {
+                    toDatePicker.Value = fromDatePicker.Value;
+                }
+                fromDate = fromDatePicker.Value;
+                LoadData();
             }
-            toDatePicker.MinDate = fromDatePicker.Value;
+
         }
 
         private void ToDatePicker_SelectionChanged(object sender, EventArgs e)
         {
-            LoadData();
-            FinancialYearComboBox.Text = "";
-            if (fromDatePicker.Value >  toDatePicker.Value)
+            if (toDatePicker.Value.Date != toDate.Date && !fyChanged)
             {
-                fromDatePicker.Value = toDatePicker.Value;
+                FinancialYearComboBox.SelectedItem = "N/A";
+                FinancialYearComboBox.Text = "N/A";
+                financialYearString = "N/A";
+                if (fromDatePicker.Value > toDatePicker.Value)
+                {
+                    fromDatePicker.Value = toDatePicker.Value;
+                }
+                toDate = toDatePicker.Value;
+                LoadData();
             }
-            fromDatePicker.MaxDate = toDatePicker.Value;
+        }
+        private void financialYearComboBox_SelectionChanged(object sender, EventArgs e)
+        {
+            //MessageBox.Show("Selected value changed to: " + investmentComboBox.SelectedItem.ToString());
+            string fy = FinancialYearComboBox.SelectedItem.ToString();
+            if (fy != financialYearString)
+            {
+
+                fyChanged = true;
+                financialYearString = fy;
+
+                Tuple<DateTime, DateTime> bounds = GetDateBoundsByFinancialYear(financialYearString);
+                fromDatePicker.Value = bounds.Item1;
+                toDatePicker.Value = bounds.Item2;
+                LoadData();
+            }
+        }
+
+        public Tuple<DateTime, DateTime> GetDateBoundsByFinancialYear(string financialYear)
+        {
+            DateTime start = oldestTransactionDate;
+            DateTime end = DateTime.Now;
+            if (financialYear != "")
+            {
+                int fy = int.Parse(financialYear);
+                start = DateTime.ParseExact($"{fy - 1}-07-01", "yyyy-MM-dd", CultureInfo.CurrentCulture);
+                end = DateTime.ParseExact($"{fy}-06-30", "yyyy-MM-dd", CultureInfo.CurrentCulture);
+            }
+            return new Tuple<DateTime, DateTime>(start, end);
+        }
+
+        private void resetDatesButton_Click(object sender, EventArgs e)
+        {
+            fyChanged = true; 
+            financialYearString = "";
+            fromDatePicker.Value = oldestTransactionDate;
+            toDatePicker.Value = DateTime.Now;
+            LoadData();
         }
     }
 }

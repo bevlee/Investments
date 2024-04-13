@@ -59,6 +59,7 @@ namespace Deductions
             label2 = new Label();
             fromDatePicker = new DateTimePicker();
             toDatePicker = new DateTimePicker();
+            resetDatesButton = new Button();
             ((System.ComponentModel.ISupportInitialize)TransactionDataGridView).BeginInit();
             menuStrip1.SuspendLayout();
             SuspendLayout();
@@ -274,30 +275,45 @@ namespace Deductions
             // 
             // fromDatePicker
             // 
+            fromDatePicker.CustomFormat = "dd-MMM-yyyy";
+            fromDatePicker.Format = DateTimePickerFormat.Custom;
             fromDatePicker.Location = new Point(896, 64);
             fromDatePicker.MaxDate = new DateTime(3000, 12, 31, 0, 0, 0, 0);
             fromDatePicker.MinDate = new DateTime(1969, 12, 1, 0, 0, 0, 0);
             fromDatePicker.Name = "fromDatePicker";
-            fromDatePicker.Size = new Size(200, 23);
+            fromDatePicker.Size = new Size(111, 23);
             fromDatePicker.TabIndex = 19;
             fromDatePicker.Value = new DateTime(1969, 12, 1, 0, 0, 0, 0);
             fromDatePicker.ValueChanged += FromDatePicker_SelectionChanged;
             // 
             // toDatePicker
             // 
-            toDatePicker.Location = new Point(897, 114);
+            toDatePicker.CustomFormat = "dd-MMM-yyyy";
+            toDatePicker.Format = DateTimePickerFormat.Custom;
+            toDatePicker.Location = new Point(896, 114);
             toDatePicker.MaxDate = new DateTime(3000, 12, 31, 0, 0, 0, 0);
             toDatePicker.MinDate = new DateTime(1970, 1, 1, 0, 0, 0, 0);
             toDatePicker.Name = "toDatePicker";
-            toDatePicker.Size = new Size(200, 23);
+            toDatePicker.Size = new Size(111, 23);
             toDatePicker.TabIndex = 20;
-            toDatePicker.ValueChanged += ToDatePicker_SelectionChanged;
+            toDatePicker.MouseLeave += ToDatePicker_SelectionChanged;
+            // 
+            // resetDatesButton
+            // 
+            resetDatesButton.Location = new Point(1042, 90);
+            resetDatesButton.Name = "resetDatesButton";
+            resetDatesButton.Size = new Size(75, 23);
+            resetDatesButton.TabIndex = 21;
+            resetDatesButton.Text = "reset Dates";
+            resetDatesButton.UseVisualStyleBackColor = true;
+            resetDatesButton.Click += resetDatesButton_Click;
             // 
             // HomePage
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1248, 604);
+            Controls.Add(resetDatesButton);
             Controls.Add(toDatePicker);
             Controls.Add(fromDatePicker);
             Controls.Add(label2);
@@ -353,5 +369,6 @@ namespace Deductions
         private Label label2;
         private DateTimePicker fromDatePicker;
         private DateTimePicker toDatePicker;
+        private Button resetDatesButton;
     }
 }
