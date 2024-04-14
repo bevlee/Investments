@@ -174,7 +174,7 @@ namespace Deductions
                     System.Diagnostics.Debug.WriteLine($" fy is not set");
                     command.CommandText =
                    @"
-                    SELECT Category, Date, LastModifiedDate, Value, TransactionType, FinancialYear, Note, Source
+                    SELECT Item, Date, LastModifiedDate, Value, TransactionType, FinancialYear, Note, Source, TransactionId
                     FROM Transactions
                     WHERE InvestmentName = @investmentName;
                     ";
@@ -183,7 +183,7 @@ namespace Deductions
                     System.Diagnostics.Debug.WriteLine($" fy is  set to {fy}");
                     command.CommandText =
                    @"
-                    SELECT Category, Date, LastModifiedDate, Value, TransactionType, FinancialYear, Note, Source
+                    SELECT Item, Date, LastModifiedDate, Value, TransactionType, FinancialYear, Note, Source, TransactionId
                     FROM Transactions
                     WHERE InvestmentName = @investmentName
                     AND FinancialYear = @financialYear;
@@ -200,7 +200,7 @@ namespace Deductions
                     while (reader.Read())
                     {
 
-                        string Category = reader.GetString(0);
+                        string item = reader.GetString(0);
                         DateTime date = UnixTimeStampToDateTime(reader.GetInt64(1));
                         DateTime lastModifiedDate = UnixTimeStampToDateTime(reader.GetInt64(2));
                         decimal value = reader.GetDecimal(3);
@@ -208,8 +208,9 @@ namespace Deductions
                         fy = reader.GetInt32(5);
                         string note = reader.GetString(6);
                         string source = reader.GetString(7);
+                        int transactionId = reader.GetInt32(8);
 
-                        transaction = new Transaction(Category, date, lastModifiedDate, value, transactionType, fy, investmentName, note, source);
+                        transaction = new Transaction(item, date, lastModifiedDate, value, transactionType, fy, investmentName, note, source, transactionId);
                         transactions.Add(transaction);
 
                     }
@@ -232,7 +233,7 @@ namespace Deductions
                 System.Diagnostics.Debug.WriteLine($" start date {startDate} to end date {endDate} ");
                 command.CommandText =
                 @"
-                SELECT Category, Date, LastModifiedDate, Value, TransactionType, FinancialYear, Note, Source
+                SELECT Item, Date, LastModifiedDate, Value, TransactionType, FinancialYear, Note, Source, TransactionId
                 FROM Transactions
                 WHERE InvestmentName = @investmentName
                 AND @startDate <= Date
@@ -247,7 +248,7 @@ namespace Deductions
                     Transaction? transaction = null;
                     while (reader.Read())
                     {
-                        string Category = reader.GetString(0);
+                        string item = reader.GetString(0);
                         DateTime date = UnixTimeStampToDateTime(reader.GetInt64(1));
                         DateTime lastModifiedDate = UnixTimeStampToDateTime(reader.GetInt64(2));
                         decimal value = reader.GetDecimal(3);
@@ -255,8 +256,9 @@ namespace Deductions
                         fy = reader.GetInt32(5);
                         string note = reader.GetString(6);
                         string source = reader.GetString(7);
+                        int transactionId = reader.GetInt32(8);
 
-                        transaction = new Transaction(Category, date, lastModifiedDate, value, transactionType, fy, investmentName, note, source);
+                        transaction = new Transaction(item, date, lastModifiedDate, value, transactionType, fy, investmentName, note, source, transactionId);
                         transactions.Add(transaction);
 
                     }
@@ -286,10 +288,8 @@ namespace Deductions
                         //transaction = reader.GetString(0);
 
                         //System.Diagnostics.Debug.WriteLine($"Hello, {name}!");
-
                     }
                 }
-
             }
             return accounts;
         }
@@ -323,17 +323,17 @@ namespace Deductions
                 var createCommand = conn.CreateCommand();
                 createCommand.CommandText =
                     @"
-                        INSERT INTO Transactions (Category, InvestmentName, Value, Date, LastModifiedDate, TransactionType, FinancialYear, Note, Source)
-                        VALUES (@Category, @investmentName, @value, @Date, @LastModifiedDate, @transactionType, @FinancialYear, @note, '');
+                        INSERT INTO Transactions (Item, InvestmentName, Value, Date, LastModifiedDate, TransactionType, FinancialYear, Note, Source)
+                        VALUES (@Item, @investmentName, @value, @Date, @LastModifiedDate, @transactionType, @FinancialYear, @note, '');
                     ";
-                createCommand.Parameters.AddWithValue("@Category", transaction.category);
-                createCommand.Parameters.AddWithValue("@investmentName", transaction.investmentName);
-                createCommand.Parameters.AddWithValue("@value", transaction.amount);
-                createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.date).ToUnixTimeSeconds());
-                createCommand.Parameters.AddWithValue("@LastModifiedDate", ((DateTimeOffset)transaction.lastModifiedDate).ToUnixTimeSeconds());
+                createCommand.Parameters.AddWithValue("@Item", transaction.Item);
+                createCommand.Parameters.AddWithValue("@investmentName", transaction.getInvestmentName());
+                createCommand.Parameters.AddWithValue("@value", transaction.Amount);
+                createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.Date).ToUnixTimeSeconds());
+                createCommand.Parameters.AddWithValue("@LastModifiedDate", ((DateTimeOffset)transaction.LastModifiedDate).ToUnixTimeSeconds());
                 createCommand.Parameters.AddWithValue("@transactionType", transaction.TransactionType);
-                createCommand.Parameters.AddWithValue("@note", transaction.note);
-                createCommand.Parameters.AddWithValue("@FinancialYear", ToFinancialYear(transaction.date));
+                createCommand.Parameters.AddWithValue("@note", transaction.Note);
+                createCommand.Parameters.AddWithValue("@FinancialYear", ToFinancialYear(transaction.Date));
 
                 createCommand.ExecuteNonQuery();
 
@@ -349,25 +349,17 @@ namespace Deductions
                     var createCommand = conn.CreateCommand();
                     createCommand.CommandText =
                         @"
-                        INSERT INTO Transactions (Category, InvestmentName, Value, Date, LastModifiedDate, TransactionType, FinancialYear, Note, Source)
-                        VALUES (@Category, @investmentName, @value, @Date, @LastModifiedDate, @transactionType, @FinancialYear, @note, '')
-                        ON CONFLICT(Category, Date, InvestmentName)
-                        DO UPDATE
-                        SET 
-                            Value=@value,
-                            LastModifiedDate=@LastModifiedDate, 
-                            TransactionType=@transactionType, 
-                            Note=@note,         
-                            Source='';
+                        INSERT INTO Transactions (Item, InvestmentName, Value, Date, LastModifiedDate, TransactionType, FinancialYear, Note, Source)
+                        VALUES (@Item, @investmentName, @value, @Date, @LastModifiedDate, @transactionType, @FinancialYear, @note, '');
                     ";
-                    createCommand.Parameters.AddWithValue("@Category", transaction.category);
-                    createCommand.Parameters.AddWithValue("@investmentName", transaction.investmentName);
-                    createCommand.Parameters.AddWithValue("@value", transaction.amount);
-                    createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.date).ToUnixTimeSeconds());
-                    createCommand.Parameters.AddWithValue("@LastModifiedDate", ((DateTimeOffset)transaction.lastModifiedDate).ToUnixTimeSeconds());
+                    createCommand.Parameters.AddWithValue("@Item", transaction.Item);
+                    createCommand.Parameters.AddWithValue("@investmentName", transaction.getInvestmentName());
+                    createCommand.Parameters.AddWithValue("@value", transaction.Amount);
+                    createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.Date).ToUnixTimeSeconds());
+                    createCommand.Parameters.AddWithValue("@LastModifiedDate", ((DateTimeOffset)transaction.LastModifiedDate).ToUnixTimeSeconds());
                     createCommand.Parameters.AddWithValue("@transactionType", transaction.TransactionType);
-                    createCommand.Parameters.AddWithValue("@note", transaction.note);
-                    createCommand.Parameters.AddWithValue("@FinancialYear", ToFinancialYear(transaction.date));
+                    createCommand.Parameters.AddWithValue("@note", transaction.Note);
+                    createCommand.Parameters.AddWithValue("@FinancialYear", ToFinancialYear(transaction.Date));
 
                     createCommand.ExecuteNonQuery();
                 }
@@ -388,40 +380,44 @@ namespace Deductions
                         UPDATE Transactions 
                         SET 
                             Value=@value,
-                            LastModifiedDate=@LastModifiedDate, 
+                            LastModifiedDate=@lastModifiedDate, 
                             TransactionType=@transactionType, 
                             Note=@note,         
                             Source='',
+                            Item = @item,
+                            InvestmentName = @investmentName,
+                            Date=@date,
+                            FinancialYear=@financialYear
                         WHERE 
-                            Category = @Category AND
-                            InvestmentName = @investmentName AND
-                            Date=@Date;
+                            TransactionId = @transactionId;
                     ";
-                    createCommand.Parameters.AddWithValue("@Category", transaction.category);
-                    createCommand.Parameters.AddWithValue("@investmentName", transaction.investmentName);
-                    createCommand.Parameters.AddWithValue("@value", transaction.amount);
-                    createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.date).ToUnixTimeSeconds());
-                    createCommand.Parameters.AddWithValue("@LastModifiedDate", ((DateTimeOffset)transaction.lastModifiedDate).ToUnixTimeSeconds());
+                    createCommand.Parameters.AddWithValue("@item", transaction.Item);
+                    createCommand.Parameters.AddWithValue("@investmentName", transaction.getInvestmentName());
+                    createCommand.Parameters.AddWithValue("@value", transaction.Amount);
+                    createCommand.Parameters.AddWithValue("@date", ((DateTimeOffset)transaction.Date).ToUnixTimeSeconds());
+                    createCommand.Parameters.AddWithValue("@lastModifiedDate", ((DateTimeOffset)transaction.LastModifiedDate).ToUnixTimeSeconds());
                     createCommand.Parameters.AddWithValue("@transactionType", transaction.TransactionType);
-                    createCommand.Parameters.AddWithValue("@note", transaction.note);
-                    createCommand.Parameters.AddWithValue("@FinancialYear", ToFinancialYear(transaction.date));
+                    createCommand.Parameters.AddWithValue("@note", transaction.Note);
+                    createCommand.Parameters.AddWithValue("@financialYear", ToFinancialYear(transaction.Date));
+                    createCommand.Parameters.AddWithValue("@transactionId", transaction.getTransactionId());
+
 
                     int updatedRows = createCommand.ExecuteNonQuery();
                     if (updatedRows == 0)
                     {
                         createCommand.CommandText =
                         @"
-                        INSERT INTO Transactions (Category, InvestmentName, Value, Date, LastModifiedDate, TransactionType, FinancialYear, Note, Source)
-                        VALUES (@Category, @investmentName, @value, @Date, @LastModifiedDate, @transactionType, @FinancialYear, @note, '');
+                        INSERT INTO Transactions (Item, InvestmentName, Value, Date, LastModifiedDate, TransactionType, FinancialYear, Note, Source)
+                        VALUES (@Item, @investmentName, @value, @Date, @LastModifiedDate, @transactionType, @FinancialYear, @note, '');
                     ";
-                        createCommand.Parameters.AddWithValue("@Category", transaction.category);
-                        createCommand.Parameters.AddWithValue("@investmentName", transaction.investmentName);
-                        createCommand.Parameters.AddWithValue("@value", transaction.amount);
-                        createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.date).ToUnixTimeSeconds());
-                        createCommand.Parameters.AddWithValue("@LastModifiedDate", ((DateTimeOffset)transaction.lastModifiedDate).ToUnixTimeSeconds());
+                        createCommand.Parameters.AddWithValue("@Item", transaction.Item);
+                        createCommand.Parameters.AddWithValue("@investmentName", transaction.getInvestmentName());
+                        createCommand.Parameters.AddWithValue("@value", transaction.Amount);
+                        createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.Date).ToUnixTimeSeconds());
+                        createCommand.Parameters.AddWithValue("@LastModifiedDate", ((DateTimeOffset)transaction.LastModifiedDate).ToUnixTimeSeconds());
                         createCommand.Parameters.AddWithValue("@transactionType", transaction.TransactionType);
-                        createCommand.Parameters.AddWithValue("@note", transaction.note);
-                        createCommand.Parameters.AddWithValue("@FinancialYear", ToFinancialYear(transaction.date));
+                        createCommand.Parameters.AddWithValue("@note", transaction.Note);
+                        createCommand.Parameters.AddWithValue("@FinancialYear", ToFinancialYear(transaction.Date));
 
                         createCommand.ExecuteNonQuery();
                     }
@@ -457,18 +453,39 @@ namespace Deductions
                     createCommand.CommandText =
                     @"
                         DELETE FROM Transactions 
-                        WHERE Category = @Category
+                        WHERE Item = @Item
                         AND InvestmentName = @investmentName
                         AND Value = @value
                         AND Date = @Date
                         AND TransactionType = @transactionType;
                     ";
-                    createCommand.Parameters.AddWithValue("@Category", transaction.category);
-                    createCommand.Parameters.AddWithValue("@investmentName", transaction.investmentName);
-                    createCommand.Parameters.AddWithValue("@value", transaction.amount);
-                    createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.date).ToUnixTimeSeconds());
+                    createCommand.Parameters.AddWithValue("@Item", transaction.Item);
+                    createCommand.Parameters.AddWithValue("@investmentName", transaction.getInvestmentName());
+                    createCommand.Parameters.AddWithValue("@value", transaction.Amount);
+                    createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.Date).ToUnixTimeSeconds());
                     createCommand.Parameters.AddWithValue("@transactionType", transaction.TransactionType);
-                    createCommand.Parameters.AddWithValue("@FinancialYear", ToFinancialYear(transaction.date));
+                    createCommand.Parameters.AddWithValue("@FinancialYear", ToFinancialYear(transaction.Date));
+                    int changed = createCommand.ExecuteNonQuery();
+                    System.Diagnostics.Debug.WriteLine($"{changed}!");
+                }
+
+                return;
+            }
+        }
+
+        public static void DeleteTransactions(List<int?> ids)
+        {
+            using (SQLiteConnection conn = CreateConnection())
+            {
+                var createCommand = conn.CreateCommand();
+                foreach (int? id in ids)
+                {
+                    createCommand.CommandText =
+                    @"
+                        DELETE FROM Transactions 
+                        WHERE TransactionId = @id;
+                    ";
+                    createCommand.Parameters.AddWithValue("@id", id);
                     int changed = createCommand.ExecuteNonQuery();
                     System.Diagnostics.Debug.WriteLine($"{changed}!");
                 }
@@ -495,7 +512,7 @@ namespace Deductions
 
         public static List<Tuple<string, string, decimal>> getSummary(string accountName, string investmentName, string financialYear)
         {
-            List<Tuple<string, string, decimal>> CategorySummary = new List<Tuple<string, string, decimal>>();
+            List<Tuple<string, string, decimal>> ItemSummary = new List<Tuple<string, string, decimal>>();
 
             using (SQLiteConnection conn = CreateConnection())
             {
@@ -508,21 +525,21 @@ namespace Deductions
                 {
                     command.CommandText =
                     @"
-                        SELECT Category, TransactionType, sum(value)
+                        SELECT Item, TransactionType, sum(value)
                         from transactions
                         WHERE InvestmentName=@investmentName
-                        group by category;
+                        group by Item;
                     ";
                     command.Parameters.AddWithValue("@investmentName", investmentName);
                 } else
                 {
                     command.CommandText =
                     @"
-                        SELECT Category, TransactionType, sum(value)
+                        SELECT Item, TransactionType, sum(value)
                         from transactions
                         WHERE InvestmentName=@investmentName
                         AND FinancialYear = @fy
-                        group by category;
+                        group by Item;
                     ";
                     command.Parameters.AddWithValue("@investmentName", investmentName);
                     command.Parameters.AddWithValue("@fy", fy);
@@ -530,19 +547,18 @@ namespace Deductions
                 }
                 using (var reader = command.ExecuteReader())
                 {
-                    Transaction? transaction = null;
                     while (reader.Read())
                     {
-                        string Category = reader.GetString(0);
+                        string Item = reader.GetString(0);
                         string transactionType = reader.GetString(1);
                         decimal value = reader.GetDecimal(2);
 
-                        CategorySummary.Add(new Tuple<string, string, decimal>(Category, transactionType, value));
+                        ItemSummary.Add(new Tuple<string, string, decimal>(Item, transactionType, value));
 
                     }
                 }
             }
-            return CategorySummary;
+            return ItemSummary;
         }
     }
 }

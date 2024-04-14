@@ -2,39 +2,44 @@
 {
     public class Transaction
     {
-        public string investmentName { get; }
-        public DateTime date { get; }
-        public string category { get; }
-        public decimal amount { get; set; }
+        private int? _transactionId;
+        private string _investmentName;
+        public DateTime Date { get; }
+        public string Item { get; }
+        public decimal Amount { get; set; }
         public string TransactionType { get; }
-        public int financialYear { get; }
-        public DateTime lastModifiedDate { get; }
-        public string note { get; }
-        public string source { get; }
+        public int FinancialYear { get; }
+        public DateTime LastModifiedDate { get; }
+        public string Note { get; }
+        public string Source { get; }
         public Transaction(string category,
                             DateTime date,
                             DateTime lastModifiedDate,
                             decimal amount,
-                            string TransactionType,
+                            string transactionType,
                             int financialYear,
                             string investmentName,
                             string note,
-                            string source)
+                            string source,
+                            int? transactionId)
         {
-            this.category = category;
-            this.TransactionType = TransactionType;
-            this.date = date.Date;
-            this.lastModifiedDate = lastModifiedDate;
-            this.amount = amount;
-            this.financialYear = financialYear;
-            this.investmentName = investmentName;
-            this.note = note;
-            this.source = source;
+            _transactionId = transactionId;
+            Item = category;
+            TransactionType = transactionType;
+            Date = date.Date;
+            LastModifiedDate = lastModifiedDate;
+            Amount = amount;
+            FinancialYear = financialYear;
+            _investmentName = investmentName;
+            Note = note;
+            Source = source;
         }
         public override string ToString()
 
         {
-            return $"Investment: {investmentName}\n date: {date}\ncategory: {category}\namount: {amount}\nTransactionType: {TransactionType}\n financialYear: {financialYear}\n lastModifiedDate: {lastModifiedDate}\n note: {note}\n source: {source}\n";
+            return $"TransactionId: {_transactionId}\nInvestment: {_investmentName}\n Date: {Date}\nItem: {Item}\namount: {Amount}\nTransactionType: {TransactionType}\n financialYear: {FinancialYear}\n lastModifiedDate: {LastModifiedDate}\n note: {Note}\n source: {Source}\n";
         }
+        public int? getTransactionId() { return _transactionId ; }
+        public string getInvestmentName() { return _investmentName; }
     }
 }

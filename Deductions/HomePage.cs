@@ -8,7 +8,7 @@ using iText.IO.Font.Constants;
 using iText.Kernel.Font;
 using iText.Layout.Properties;
 using System.Globalization;
-using System.Windows.Forms;
+using System.Data;
 namespace Deductions
 {
     public partial class HomePage : Form
@@ -18,7 +18,7 @@ namespace Deductions
         private string financialYearString = "";
         private DateTime oldestTransactionDate = DateTime.UnixEpoch;
         private HashSet<string> allDates;
-        private string[] mandatoryFields = ["Category", "TransactionType", "Amount", "Date"];
+        private string[] mandatoryFields = ["Item", "TransactionType", "Amount", "Date"];
         private bool fyChanged = true;
         private DateTime fromDate = DateTime.UnixEpoch;
         private DateTime toDate = DateTime.Now;
@@ -97,7 +97,8 @@ namespace Deductions
                     command.CommandText =
                     @"
                         CREATE TABLE Transactions (
-                        Category TEXT NOT NULL,
+                        TransactionId INTEGER PRIMARY KEY,
+                        Item TEXT NOT NULL,
                         Date INTEGER NOT NULL,
                         LastModifiedDate INTEGER NOT NULL,
                         Value REAL NOT NULL,
@@ -106,7 +107,6 @@ namespace Deductions
                         InvestmentName TEXT NOT NULL,
                         Note TEXT NOT NULL,
                         Source TEXT NOT NULL,
-                        PRIMARY KEY (Category, Date, InvestmentName),
                         FOREIGN KEY (Source) REFERENCES Sources (Source),
                         FOREIGN KEY (InvestmentName) REFERENCES Investments (InvestmentName)
                         );
@@ -141,7 +141,7 @@ namespace Deductions
                     // create dummy transactions
                     command.CommandText =
                     @"
-                        INSERT INTO Transactions (Category, InvestmentName, Value, Date, LastModifiedDate, Note, TransactionType, FinancialYear, Source)
+                        INSERT INTO Transactions (Item, InvestmentName, Value, Date, LastModifiedDate, Note, TransactionType, FinancialYear, Source)
                         VALUES 
                             ('Rent', 'Test', 1500, 1706792400, $currentDate, '', 'Income', '2024', ''),
                             ('Rent', 'Test', 1500, 1707915600, $currentDate, '', 'Income', '2024', ''),
@@ -197,21 +197,26 @@ namespace Deductions
                 DialogResult dialogResult = MessageBox.Show($"Are you sure you wish to delete the selected {TransactionDataGridView.SelectedRows.Count} transactions?", "Delete Selected Rows", MessageBoxButtons.YesNo);
                 if (dialogResult == DialogResult.Yes)
                 {
-                    List<Transaction> transactionList = new List<Transaction>();
+                    List<int?> transactionIds = new List<int?>();
+                    List<Transaction> allTransactions = (List<Transaction>) TransactionDataGridView.DataSource;
                     foreach (DataGridViewRow row in TransactionDataGridView.SelectedRows)
                     {
-                        DateTime date = DateTime.Parse(row.Cells[0].Value.ToString());
-                        string category = row.Cells[1].Value.ToString();
-                        decimal value = currencyToDecimal(row.Cells[2].Value.ToString());
-                        string transactionType = row.Cells[3].Value.ToString();
-                        int financialYear = int.Parse(row.Cells[4].Value.ToString());
-                        DateTime lastModifiedDate = DateTime.Parse(row.Cells[5].Value.ToString());
-                        string note = row.Cells[6].Value.ToString();
-                        string source = "";
-                        transactionList.Add(new Transaction(category, date, lastModifiedDate, value, transactionType, financialYear, selectedInvestment, note, source));
+                        int rowId = row.Index;
+                        transactionIds.Add(allTransactions[rowId].getTransactionId());
+
+
+                        //DateTime date = DateTime.Parse(row.Cells[0].Value.ToString());
+                        //string Item = row.Cells[1].Value.ToString();
+                        //decimal value = currencyToDecimal(row.Cells[2].Value.ToString());
+                        //string transactionType = row.Cells[3].Value.ToString();
+                        //int financialYear = int.Parse(row.Cells[4].Value.ToString());
+                        //DateTime lastModifiedDate = DateTime.Parse(row.Cells[5].Value.ToString());
+                        //string note = row.Cells[6].Value.ToString();
+                        //string source = "";
+                        //transactionList.Add(new Transaction(Item, date, lastModifiedDate, value, transactionType, financialYear, selectedInvestment, note, source, 1));
 
                     }
-                    Database.DeleteTransactions(transactionList);
+                    Database.DeleteTransactions(transactionIds);
                     LoadData();
                 }
             }
@@ -233,12 +238,12 @@ namespace Deductions
             decimal netValue = 0;
             allTransactions.ForEach(transaction =>
             {
-                netValue += transaction.TransactionType == "Income" ? transaction.amount : -transaction.amount;
+                netValue += transaction.TransactionType == "Income" ? transaction.Amount : -transaction.Amount;
             });
             string netValueString = netValue < 0 ? "-$" + Math.Abs(netValue) : "$" + netValue;
             //List<TransactionDisplay> transactionDisplays = new List<TransactionDisplay>();
-            var transactionDisplays = allTransactions.Select(transaction => new TransactionDisplay(transaction)).ToList();
-            TransactionDataGridView.DataSource = transactionDisplays;
+            //var transactionDisplays = allTransactions.Select(transaction => new TransactionDisplay(transaction)).ToList();
+            TransactionDataGridView.DataSource = allTransactions;
 
             // reload the selected dates
             allDates = new HashSet<string>([""]);
@@ -301,12 +306,12 @@ namespace Deductions
                 _sortDirection ^= true; // toggle direction
 
             TransactionDataGridView.DataSource = SortData(
-                (List<TransactionDisplay>)TransactionDataGridView.DataSource, TransactionDataGridView.Columns[e.ColumnIndex].Name, _sortDirection);
+                (List<Transaction>)TransactionDataGridView.DataSource, TransactionDataGridView.Columns[e.ColumnIndex].Name, _sortDirection);
 
             _previousIndex = e.ColumnIndex;
         }
 
-        private List<TransactionDisplay> SortData(List<TransactionDisplay> list, string column, bool ascending)
+        private List<Transaction> SortData(List<Transaction> list, string column, bool ascending)
         {
             return ascending ?
                 list.OrderBy(_ => _.GetType().GetProperty(column).GetValue(_)).ToList() :
@@ -335,7 +340,7 @@ namespace Deductions
         {
             List<Transaction> transactions = new List<Transaction>();
             Transaction transaction;
-            string category;
+            string Item;
             string TransactionType;
             DateTime date;
             DateTime lastModifiedDate = DateTime.Now;
@@ -362,7 +367,7 @@ namespace Deductions
                         {
                             while (csv.ReadNextRecord())
                             {
-                                category = csv[3];
+                                Item = csv[3];
                                 TransactionType = csv[1];
                                 date = DateTime.Parse(csv[0]);
                                 amount = decimal.Parse(csv[2]);
@@ -371,7 +376,7 @@ namespace Deductions
                                 {
                                     note = csv[4];
                                 }
-                                transaction = new Transaction(category, date, lastModifiedDate, amount, TransactionType, financialYear, investmentName, note, source);
+                                transaction = new Transaction(Item, date, lastModifiedDate, amount, TransactionType, financialYear, investmentName, note, source, 1);
                                 //System.Diagnostics.Debug.WriteLine($" \"{headers[i]} = {csv[i]}\",\r\n");
                                 transactions.Add(transaction);
 
@@ -392,7 +397,7 @@ namespace Deductions
                 {
                     if (ex.Message == "mandatory fields not present in csv file")
                     {
-                        MessageBox.Show(ex.Message + ". Please ensure the format is Date, TransactionType, Amount, Category, Notes (optional)");
+                        MessageBox.Show(ex.Message + ". Please ensure the format is Date, TransactionType, Amount, Item, Notes (optional)");
                     }
                     System.Diagnostics.Debug.WriteLine(ex);
                 }
@@ -401,20 +406,20 @@ namespace Deductions
 
         private void generateReportButton_Click(object sender, EventArgs e)
         {
-            List<Tuple<string, string, decimal>> categorySummary = Database.getSummary(accountName, selectedInvestment, financialYearString);
+            List<Tuple<string, string, decimal>> ItemSummary = Database.getSummary(accountName, selectedInvestment, financialYearString);
             //System.Diagnostics.Debug.WriteLine($" \"{headers[i]} = {csv[i]}\",\r\n");
             List<Tuple<string, decimal>> expenses = new List<Tuple<string, decimal>>();
             List<Tuple<string, decimal>> income = new List<Tuple<string, decimal>>();
-            foreach (Tuple<string, string, decimal> category in categorySummary)
+            foreach (Tuple<string, string, decimal> Item in ItemSummary)
             {
-                System.Diagnostics.Debug.WriteLine($" \"{category.Item1} = {category.Item3}\",\r\n");
-                if (category.Item2 == "Expense")
+                System.Diagnostics.Debug.WriteLine($" \"{Item.Item1} = {Item.Item3}\",\r\n");
+                if (Item.Item2 == "Expense")
                 {
-                    expenses.Add(new Tuple<string, decimal>(category.Item1, category.Item3));
+                    expenses.Add(new Tuple<string, decimal>(Item.Item1, Item.Item3));
                 }
                 else
                 {
-                    income.Add(new Tuple<string, decimal>(category.Item1, category.Item3));
+                    income.Add(new Tuple<string, decimal>(Item.Item1, Item.Item3));
                 }
             }
             decimal incomeTotal = income.Sum(x => x.Item2);
@@ -443,14 +448,14 @@ namespace Deductions
 
                 Table table = new Table(UnitValue.CreatePercentArray(new float[] { 80, 10, 10 }));
                 table.SetMarginTop(5);
-                table.AddCell("Category");
+                table.AddCell("Item");
                 table.AddCell("Expense");
                 table.AddCell("Income");
-                foreach (Tuple<string, string, decimal> category in categorySummary)
+                foreach (Tuple<string, string, decimal> Item in ItemSummary)
                 {
-                    table.AddCell(category.Item1);
-                    table.AddCell(category.Item2 == "Expense" ? category.Item3.ToString() : "");
-                    table.AddCell(category.Item2 == "Expense" ? "" : category.Item3.ToString());
+                    table.AddCell(Item.Item1);
+                    table.AddCell(Item.Item2 == "Expense" ? Item.Item3.ToString() : "");
+                    table.AddCell(Item.Item2 == "Expense" ? "" : Item.Item3.ToString());
                 }
                 table.AddCell("Total");
                 table.AddCell(new Cell(1, 2).Add(new Paragraph(totalString)));
@@ -539,16 +544,20 @@ namespace Deductions
             
             if (e.RowIndex > -1)
             {
-                DateTime date = DateTime.Parse(TransactionDataGridView.CurrentRow.Cells[0].Value.ToString());
-                string category = TransactionDataGridView.CurrentRow.Cells[1].Value.ToString();
-                decimal value = currencyToDecimal(TransactionDataGridView.CurrentRow.Cells[2].Value.ToString());
-                string transactionType = TransactionDataGridView.CurrentRow.Cells[3].Value.ToString();
-                int financialYear = int.Parse(TransactionDataGridView.CurrentRow.Cells[4].Value.ToString());
-                DateTime lastModifiedDate = DateTime.Parse(TransactionDataGridView.CurrentRow.Cells[5].Value.ToString());
-                string note = TransactionDataGridView.CurrentRow.Cells[6].Value.ToString();
-                string source = "";
-                Transaction selectedTransaction = new Transaction(category, date, lastModifiedDate, value, transactionType, financialYear, selectedInvestment, note, source);
+                List<Transaction> dt = (List<Transaction>)TransactionDataGridView.DataSource;
+                Transaction row = dt[e.RowIndex];
 
+                DateTime date = row.Date;
+                string Item = row.Item;
+                decimal amount = row.Amount;
+                string transactionType = row.TransactionType;
+                int financialYear = row.FinancialYear;
+                DateTime lastModifiedDate = row.LastModifiedDate;
+                string note = row.Note;
+                string source = row.Source;
+                int? transactionId = row.getTransactionId();
+                Transaction selectedTransaction = new Transaction(Item, date, lastModifiedDate, amount, transactionType, financialYear, selectedInvestment, note, source, transactionId);
+                
                 CreateTransaction editTransactionForm = new CreateTransaction(selectedTransaction);
                 if (editTransactionForm.ShowDialog() == DialogResult.OK)
                 {

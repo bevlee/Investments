@@ -2,6 +2,7 @@
 {
     public partial class CreateTransaction : Form
     {
+        private int? _id = null;
         public CreateTransaction(string investmentName)
         {
             InitializeComponent();
@@ -23,16 +24,17 @@
         {
             List<string> investments = Database.getAllInvestments();
             investmentComboBox.DataSource = investments;
-            investmentComboBox.SelectedItem = transaction.investmentName;
-            categoryTextBox.Text = transaction.category;
-            TransactionValueTextBox.Text = transaction.amount.ToString();
+            investmentComboBox.SelectedItem = transaction.getInvestmentName();
+            categoryTextBox.Text = transaction.Item;
+            TransactionValueTextBox.Text = transaction.Amount.ToString();
 
             string[] transactionTypes = ["Income", "Expense"];
             TransactionTypeComboBox.DataSource = transactionTypes;  
             TransactionTypeComboBox.SelectedItem = transaction.TransactionType;
 
-            TransactionDatePicker.Value = transaction.date;
-            noteTextBox.Text = transaction.note;
+            TransactionDatePicker.Value = transaction.Date;
+            noteTextBox.Text = transaction.Note;
+            _id = transaction.getTransactionId();
         }
         
         private void LoadData(string investmentName)
@@ -96,7 +98,7 @@
                 string name = categoryTextBox.Text;
                 DateTime date = TransactionDatePicker.Value.Date;
                 int fy = ToFinancialYear(TransactionDatePicker.Value);
-                Database.UpsertTransaction(new Transaction(name, date, DateTime.Now, value, TransactionTypeComboBox.Text, 24, investmentComboBox.Text, noteTextBox.Text, ""));
+                Database.UpsertTransaction(new Transaction(name, date, DateTime.Now, value, TransactionTypeComboBox.Text, fy, investmentComboBox.Text, noteTextBox.Text, "", _id));
                 this.DialogResult = DialogResult.OK;
             }
         }
