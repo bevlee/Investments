@@ -1,6 +1,6 @@
 ﻿namespace Deductions
 {
-    internal class Transaction
+    public class Transaction
     {
         public string investmentName { get; }
         public DateTime date { get; }

@@ -48,7 +48,7 @@
             createTransactionButton.Location = new Point(190, 514);
             createTransactionButton.Name = "createTransactionButton";
             createTransactionButton.Size = new Size(75, 23);
-            createTransactionButton.TabIndex = 2;
+            createTransactionButton.TabIndex = 5;
             createTransactionButton.Text = "Create";
             createTransactionButton.UseVisualStyleBackColor = true;
             createTransactionButton.Click += createTransactionButton_Click;
@@ -76,7 +76,7 @@
             investmentComboBox.Location = new Point(83, 79);
             investmentComboBox.Name = "investmentComboBox";
             investmentComboBox.Size = new Size(272, 23);
-            investmentComboBox.TabIndex = 3;
+            investmentComboBox.TabIndex = 6;
             // 
             // categoryLabel
             // 
@@ -119,7 +119,7 @@
             TransactionTypeComboBox.Location = new Point(83, 289);
             TransactionTypeComboBox.Name = "TransactionTypeComboBox";
             TransactionTypeComboBox.Size = new Size(272, 23);
-            TransactionTypeComboBox.TabIndex = 3;
+            TransactionTypeComboBox.TabIndex = 2;
             // 
             // TransactionDateLabel
             // 
@@ -135,7 +135,7 @@
             TransactionDatePicker.Location = new Point(83, 353);
             TransactionDatePicker.Name = "TransactionDatePicker";
             TransactionDatePicker.Size = new Size(272, 23);
-            TransactionDatePicker.TabIndex = 4;
+            TransactionDatePicker.TabIndex = 3;
             // 
             // noteLabel
             // 
@@ -152,7 +152,7 @@
             noteTextBox.Multiline = true;
             noteTextBox.Name = "noteTextBox";
             noteTextBox.Size = new Size(272, 71);
-            noteTextBox.TabIndex = 19;
+            noteTextBox.TabIndex = 4;
             // 
             // CreateTransaction
             // 

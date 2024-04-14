@@ -2,6 +2,7 @@
 {
     internal class TransactionDisplay
     {
+        private string _name;  
         public DateTime Date { get; }
         public string Item { get; }
         public string Amount { get; set; }
@@ -28,6 +29,7 @@
 
         public TransactionDisplay(Transaction transaction)
         {
+            this._name = "secret string";
             this.Item = transaction.category;
             this.TransactionType = transaction.TransactionType;
             this.Date = transaction.date.Date;

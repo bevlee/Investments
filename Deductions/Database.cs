@@ -375,6 +375,65 @@ namespace Deductions
                 return;
             }
         }
+
+        internal static bool UpsertTransaction(Transaction transaction)
+        {
+            try
+            {
+                using (SQLiteConnection conn = CreateConnection())
+                {
+                    var createCommand = conn.CreateCommand();
+                    createCommand.CommandText =
+                        @"
+                        UPDATE Transactions 
+                        SET 
+                            Value=@value,
+                            LastModifiedDate=@LastModifiedDate, 
+                            TransactionType=@transactionType, 
+                            Note=@note,         
+                            Source='',
+                        WHERE 
+                            Category = @Category AND
+                            InvestmentName = @investmentName AND
+                            Date=@Date;
+                    ";
+                    createCommand.Parameters.AddWithValue("@Category", transaction.category);
+                    createCommand.Parameters.AddWithValue("@investmentName", transaction.investmentName);
+                    createCommand.Parameters.AddWithValue("@value", transaction.amount);
+                    createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.date).ToUnixTimeSeconds());
+                    createCommand.Parameters.AddWithValue("@LastModifiedDate", ((DateTimeOffset)transaction.lastModifiedDate).ToUnixTimeSeconds());
+                    createCommand.Parameters.AddWithValue("@transactionType", transaction.TransactionType);
+                    createCommand.Parameters.AddWithValue("@note", transaction.note);
+                    createCommand.Parameters.AddWithValue("@FinancialYear", ToFinancialYear(transaction.date));
+
+                    int updatedRows = createCommand.ExecuteNonQuery();
+                    if (updatedRows == 0)
+                    {
+                        createCommand.CommandText =
+                        @"
+                        INSERT INTO Transactions (Category, InvestmentName, Value, Date, LastModifiedDate, TransactionType, FinancialYear, Note, Source)
+                        VALUES (@Category, @investmentName, @value, @Date, @LastModifiedDate, @transactionType, @FinancialYear, @note, '');
+                    ";
+                        createCommand.Parameters.AddWithValue("@Category", transaction.category);
+                        createCommand.Parameters.AddWithValue("@investmentName", transaction.investmentName);
+                        createCommand.Parameters.AddWithValue("@value", transaction.amount);
+                        createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.date).ToUnixTimeSeconds());
+                        createCommand.Parameters.AddWithValue("@LastModifiedDate", ((DateTimeOffset)transaction.lastModifiedDate).ToUnixTimeSeconds());
+                        createCommand.Parameters.AddWithValue("@transactionType", transaction.TransactionType);
+                        createCommand.Parameters.AddWithValue("@note", transaction.note);
+                        createCommand.Parameters.AddWithValue("@FinancialYear", ToFinancialYear(transaction.date));
+
+                        createCommand.ExecuteNonQuery();
+                    }
+                }
+            } catch (Exception e)
+            {
+                MessageBox.Show(e.ToString() + Environment.NewLine + e.StackTrace);
+                return false;
+            }
+
+            return true;
+        }
         public static DateTime UnixTimeStampToDateTime(long unixTimeStamp)
         {
             // Unix timestamp is seconds past epoch

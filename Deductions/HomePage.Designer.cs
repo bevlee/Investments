@@ -138,6 +138,7 @@ namespace Deductions
             TransactionDataGridView.ReadOnly = true;
             TransactionDataGridView.Size = new Size(1052, 349);
             TransactionDataGridView.TabIndex = 7;
+            TransactionDataGridView.CellMouseDoubleClick += TransactionDataGridView_CellMouseDoubleClick;
             TransactionDataGridView.ColumnHeaderMouseClick += TransactionDataGridView_ColumnHeaderMouseClick;
             // 
             // createTransactionButton
@@ -296,7 +297,7 @@ namespace Deductions
             toDatePicker.Name = "toDatePicker";
             toDatePicker.Size = new Size(111, 23);
             toDatePicker.TabIndex = 20;
-            toDatePicker.MouseLeave += ToDatePicker_SelectionChanged;
+            toDatePicker.ValueChanged += ToDatePicker_SelectionChanged;
             // 
             // resetDatesButton
             // 

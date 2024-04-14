@@ -8,6 +8,7 @@ using iText.IO.Font.Constants;
 using iText.Kernel.Font;
 using iText.Layout.Properties;
 using System.Globalization;
+using System.Windows.Forms;
 namespace Deductions
 {
     public partial class HomePage : Form
@@ -199,15 +200,14 @@ namespace Deductions
                     List<Transaction> transactionList = new List<Transaction>();
                     foreach (DataGridViewRow row in TransactionDataGridView.SelectedRows)
                     {
-                        string selectedInvestment = row.Cells[0].Value.ToString();
-                        DateTime date = DateTime.Parse(row.Cells[1].Value.ToString());
-                        string category = row.Cells[2].Value.ToString();
-                        decimal value = decimal.Parse(row.Cells[3].Value.ToString());
-                        string transactionType = row.Cells[4].Value.ToString();
-                        int financialYear = int.Parse(row.Cells[5].Value.ToString());
-                        DateTime lastModifiedDate = DateTime.Parse(row.Cells[6].Value.ToString());
-                        string note = row.Cells[7].Value.ToString();
-                        string source = row.Cells[8].Value.ToString();
+                        DateTime date = DateTime.Parse(row.Cells[0].Value.ToString());
+                        string category = row.Cells[1].Value.ToString();
+                        decimal value = currencyToDecimal(row.Cells[2].Value.ToString());
+                        string transactionType = row.Cells[3].Value.ToString();
+                        int financialYear = int.Parse(row.Cells[4].Value.ToString());
+                        DateTime lastModifiedDate = DateTime.Parse(row.Cells[5].Value.ToString());
+                        string note = row.Cells[6].Value.ToString();
+                        string source = "";
                         transactionList.Add(new Transaction(category, date, lastModifiedDate, value, transactionType, financialYear, selectedInvestment, note, source));
 
                     }
@@ -227,7 +227,7 @@ namespace Deductions
             }
             else
             {
-                allTransactions = Database.LoadTransactions(selectedInvestment, fromDatePicker.Value, toDatePicker.Value);
+                allTransactions = Database.LoadTransactions(selectedInvestment, fromDate, toDate);
             }
 
             decimal netValue = 0;
@@ -270,7 +270,6 @@ namespace Deductions
 
         private void createTransactionButton_Click(object sender, EventArgs e)
         {
-
             CreateTransaction createTransactionForm = new CreateTransaction(selectedInvestment);
             if (createTransactionForm.ShowDialog() == DialogResult.OK)
             {
@@ -377,8 +376,6 @@ namespace Deductions
                                 transactions.Add(transaction);
 
                                 System.Diagnostics.Debug.WriteLine(transaction.ToString());
-
-
                             }
                         }
                         else
@@ -507,8 +504,10 @@ namespace Deductions
                 financialYearString = fy;
 
                 Tuple<DateTime, DateTime> bounds = GetDateBoundsByFinancialYear(financialYearString);
-                fromDatePicker.Value = bounds.Item1;
-                toDatePicker.Value = bounds.Item2;
+                fromDate = bounds.Item1;
+                fromDatePicker.Value = fromDate;
+                toDate = bounds.Item2;
+                toDatePicker.Value = toDate;
                 LoadData();
             }
         }
@@ -528,11 +527,39 @@ namespace Deductions
 
         private void resetDatesButton_Click(object sender, EventArgs e)
         {
-            fyChanged = true; 
+            fyChanged = true;
             financialYearString = "";
             fromDatePicker.Value = oldestTransactionDate;
             toDatePicker.Value = DateTime.Now;
             LoadData();
+        }
+
+        public void TransactionDataGridView_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            
+            if (e.RowIndex > -1)
+            {
+                DateTime date = DateTime.Parse(TransactionDataGridView.CurrentRow.Cells[0].Value.ToString());
+                string category = TransactionDataGridView.CurrentRow.Cells[1].Value.ToString();
+                decimal value = currencyToDecimal(TransactionDataGridView.CurrentRow.Cells[2].Value.ToString());
+                string transactionType = TransactionDataGridView.CurrentRow.Cells[3].Value.ToString();
+                int financialYear = int.Parse(TransactionDataGridView.CurrentRow.Cells[4].Value.ToString());
+                DateTime lastModifiedDate = DateTime.Parse(TransactionDataGridView.CurrentRow.Cells[5].Value.ToString());
+                string note = TransactionDataGridView.CurrentRow.Cells[6].Value.ToString();
+                string source = "";
+                Transaction selectedTransaction = new Transaction(category, date, lastModifiedDate, value, transactionType, financialYear, selectedInvestment, note, source);
+
+                CreateTransaction editTransactionForm = new CreateTransaction(selectedTransaction);
+                if (editTransactionForm.ShowDialog() == DialogResult.OK)
+                {
+                    LoadData();
+                }
+            }
+        }
+
+        public decimal currencyToDecimal(string currency)
+        {
+            return decimal.Parse(currency.Split("$")[1]);
         }
     }
 }

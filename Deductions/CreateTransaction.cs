@@ -8,11 +8,33 @@
             LoadData(investmentName);
         }
 
+        public CreateTransaction(Transaction transaction)
+        {
+            InitializeComponent();
+            LoadData(transaction);
+        }
+
         public CreateTransaction(string investmentName, string investmentType)
         {
             InitializeComponent();
             LoadData(investmentName, investmentType);
         }
+        private void LoadData(Transaction transaction)
+        {
+            List<string> investments = Database.getAllInvestments();
+            investmentComboBox.DataSource = investments;
+            investmentComboBox.SelectedItem = transaction.investmentName;
+            categoryTextBox.Text = transaction.category;
+            TransactionValueTextBox.Text = transaction.amount.ToString();
+
+            string[] transactionTypes = ["Income", "Expense"];
+            TransactionTypeComboBox.DataSource = transactionTypes;  
+            TransactionTypeComboBox.SelectedItem = transaction.TransactionType;
+
+            TransactionDatePicker.Value = transaction.date;
+            noteTextBox.Text = transaction.note;
+        }
+        
         private void LoadData(string investmentName)
         {
 
@@ -74,7 +96,7 @@
                 string name = categoryTextBox.Text;
                 DateTime date = TransactionDatePicker.Value.Date;
                 int fy = ToFinancialYear(TransactionDatePicker.Value);
-                Database.CreateNewTransactions(new Transaction(name, date, DateTime.Now, value, TransactionTypeComboBox.Text, 24, investmentComboBox.Text, noteTextBox.Text, ""));
+                Database.UpsertTransaction(new Transaction(name, date, DateTime.Now, value, TransactionTypeComboBox.Text, 24, investmentComboBox.Text, noteTextBox.Text, ""));
                 this.DialogResult = DialogResult.OK;
             }
         }
