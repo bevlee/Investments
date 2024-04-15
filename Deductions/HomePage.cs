@@ -406,7 +406,7 @@ namespace Deductions
 
         private void generateReportButton_Click(object sender, EventArgs e)
         {
-            List<Tuple<string, string, decimal>> ItemSummary = Database.getSummary(accountName, selectedInvestment, financialYearString);
+            List<Tuple<string, string, decimal>> ItemSummary = Database.getSummary(accountName, selectedInvestment, financialYearString, fromDate, toDate);
             //System.Diagnostics.Debug.WriteLine($" \"{headers[i]} = {csv[i]}\",\r\n");
             List<Tuple<string, decimal>> expenses = new List<Tuple<string, decimal>>();
             List<Tuple<string, decimal>> income = new List<Tuple<string, decimal>>();
@@ -440,28 +440,62 @@ namespace Deductions
                 Style titleStyle = new Style()
                 .SetFont(code)
                 .SetFontSize(28)
-                .SetFontColor(ColorConstants.RED)
+                .SetFontColor(ColorConstants.BLUE)
                 .SetBackgroundColor(ColorConstants.LIGHT_GRAY);
-                Paragraph title = new Paragraph($"{(financialYearString == "" ? "Historical" : financialYearString)} summary for {selectedInvestment}").AddStyle(titleStyle);
+                Paragraph title = new Paragraph($"Summary for {selectedInvestment}").AddStyle(titleStyle);
+                string timePeriod = financialYearString == "" ? $"{fromDate.Date.ToShortDateString()} to {toDate.Date.ToShortDateString()}" : $"Financial year {financialYearString}";
+                Paragraph year = new Paragraph(timePeriod).AddStyle(titleStyle);
+                
 
                 doc.Add(title);
+                doc.Add(year);
 
-                Table table = new Table(UnitValue.CreatePercentArray(new float[] { 80, 10, 10 }));
-                table.SetMarginTop(5);
-                table.AddCell("Item");
-                table.AddCell("Expense");
-                table.AddCell("Income");
-                foreach (Tuple<string, string, decimal> Item in ItemSummary)
+                Table expenseTable = new Table(UnitValue.CreatePercentArray(new float[] { 80, 10, 10 }));
+                expenseTable.SetMarginTop(5);
+                expenseTable.AddCell("Expense Item");
+                expenseTable.AddCell("Expense");
+                expenseTable.AddCell("Income");
+                foreach (Tuple<string, decimal> Item in expenses)
                 {
-                    table.AddCell(Item.Item1);
-                    table.AddCell(Item.Item2 == "Expense" ? Item.Item3.ToString() : "");
-                    table.AddCell(Item.Item2 == "Expense" ? "" : Item.Item3.ToString());
+                    expenseTable.AddCell(Item.Item1);
+                    expenseTable.AddCell(Item.Item2.ToString());
+                    expenseTable.AddCell("");
                 }
-                table.AddCell("Total");
-                table.AddCell(new Cell(1, 2).Add(new Paragraph(totalString)));
+                expenseTable.AddCell(new Paragraph("Expenses Total").SetBold());
+                expenseTable.AddCell(new Cell(1, 2).Add(new Paragraph("$" + expensesTotal.ToString()).SetBold()));
 
-                doc.Add(table);
+                doc.Add(expenseTable);
+                Table incomeTable = new Table(UnitValue.CreatePercentArray(new float[] { 80, 10, 10 }));
+                incomeTable.SetMarginTop(5);
+                incomeTable.AddCell("Income Item");
+                incomeTable.AddCell("Expense");
+                incomeTable.AddCell("Income");
+                foreach (Tuple<string, decimal> Item in income)
+                {
+                    incomeTable.AddCell(Item.Item1);
+                    incomeTable.AddCell("");
+                    incomeTable.AddCell(Item.Item2.ToString());
+                }
+                incomeTable.AddCell(new Paragraph("Income Total").SetBold());
+                incomeTable.AddCell(new Cell(1, 2).Add(new Paragraph("$" + incomeTotal.ToString()).SetBold()));
 
+                doc.Add(incomeTable);
+
+                Table summaryTable = new Table(UnitValue.CreatePercentArray(new float[] { 80, 10, 10 }));
+                summaryTable.SetMarginTop(5);
+                summaryTable.AddCell("Net Income");
+                summaryTable.AddCell("Expense");
+                summaryTable.AddCell("Income");
+
+                summaryTable.AddCell("Expenses");
+                summaryTable.AddCell(expensesTotal.ToString());
+                summaryTable.AddCell("");
+                summaryTable.AddCell("Income");
+                summaryTable.AddCell("");
+                summaryTable.AddCell(incomeTotal.ToString());
+                summaryTable.AddCell(new Paragraph("Total").SetBold());
+                summaryTable.AddCell(new Cell(1, 2).Add(new Paragraph(totalString)).SetBold());
+                doc.Add(summaryTable);
                 doc.Close();
             }
         }

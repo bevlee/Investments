@@ -510,7 +510,7 @@ namespace Deductions
             }
         }
 
-        public static List<Tuple<string, string, decimal>> getSummary(string accountName, string investmentName, string financialYear)
+        public static List<Tuple<string, string, decimal>> getSummary(string accountName, string investmentName, string financialYear, DateTime start, DateTime end)
         {
             List<Tuple<string, string, decimal>> ItemSummary = new List<Tuple<string, string, decimal>>();
 
@@ -539,11 +539,15 @@ namespace Deductions
                         from transactions
                         WHERE InvestmentName=@investmentName
                         AND FinancialYear = @fy
+                        AND @startDate <= Date
+                        AND @endDate >= Date;
                         group by Item;
                     ";
                     command.Parameters.AddWithValue("@investmentName", investmentName);
                     command.Parameters.AddWithValue("@fy", fy);
-                    
+                    command.Parameters.AddWithValue("@startDate", start);
+                    command.Parameters.AddWithValue("@endDate", end);
+
                 }
                 using (var reader = command.ExecuteReader())
                 {
