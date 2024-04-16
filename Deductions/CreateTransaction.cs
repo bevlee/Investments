@@ -29,14 +29,14 @@
             TransactionValueTextBox.Text = transaction.Amount.ToString();
 
             string[] transactionTypes = ["Income", "Expense"];
-            TransactionTypeComboBox.DataSource = transactionTypes;  
+            TransactionTypeComboBox.DataSource = transactionTypes;
             TransactionTypeComboBox.SelectedItem = transaction.TransactionType;
 
             TransactionDatePicker.Value = transaction.Date;
             noteTextBox.Text = transaction.Note;
             _id = transaction.getTransactionId();
         }
-        
+
         private void LoadData(string investmentName)
         {
 
@@ -61,7 +61,15 @@
         }
         private void createTransactionButton_Click(object sender, EventArgs e)
         {
-            
+            Transaction? newTransaction = ValidateFields();
+            if (newTransaction != null)
+            {
+                Database.UpsertTransaction(newTransaction);
+                this.DialogResult = DialogResult.OK;
+            }
+        }
+        private Transaction? ValidateFields()
+        {
             bool valid = true;
             decimal value;
             if (TransactionTypeComboBox.Text == null)
@@ -98,14 +106,22 @@
                 string name = categoryTextBox.Text;
                 DateTime date = TransactionDatePicker.Value.Date;
                 int fy = ToFinancialYear(TransactionDatePicker.Value);
-                Database.UpsertTransaction(new Transaction(name, date, DateTime.Now, value, TransactionTypeComboBox.Text, fy, investmentComboBox.Text, noteTextBox.Text, "", _id));
-                this.DialogResult = DialogResult.OK;
+                return new Transaction(name, date, DateTime.Now, value, TransactionTypeComboBox.Text, fy, investmentComboBox.Text, noteTextBox.Text, "", _id);
             }
+            return null;
         }
-
         public static int ToFinancialYear(DateTime dateTime)
         {
             return dateTime.Month >= 7 ? dateTime.Year + 1 : dateTime.Year;
+        }
+
+        private void createAgainButton_Click(object sender, EventArgs e)
+        {
+            Transaction? newTransaction = ValidateFields();
+            if (newTransaction != null)
+            {
+                Database.UpsertTransaction(newTransaction);
+            }
         }
     }
 }

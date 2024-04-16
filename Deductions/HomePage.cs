@@ -445,7 +445,6 @@ namespace Deductions
                 Paragraph title = new Paragraph($"Summary for {selectedInvestment}").AddStyle(titleStyle);
                 string timePeriod = financialYearString == "" ? $"{fromDate.Date.ToShortDateString()} to {toDate.Date.ToShortDateString()}" : $"Financial year {financialYearString}";
                 Paragraph year = new Paragraph(timePeriod).AddStyle(titleStyle);
-                
 
                 doc.Add(title);
                 doc.Add(year);

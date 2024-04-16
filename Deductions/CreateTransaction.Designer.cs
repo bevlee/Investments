@@ -41,11 +41,12 @@
             TransactionDatePicker = new DateTimePicker();
             noteLabel = new Label();
             noteTextBox = new TextBox();
+            createAgainButton = new Button();
             SuspendLayout();
             // 
             // createTransactionButton
             // 
-            createTransactionButton.Location = new Point(190, 514);
+            createTransactionButton.Location = new Point(280, 515);
             createTransactionButton.Name = "createTransactionButton";
             createTransactionButton.Size = new Size(75, 23);
             createTransactionButton.TabIndex = 5;
@@ -154,11 +155,22 @@
             noteTextBox.Size = new Size(272, 71);
             noteTextBox.TabIndex = 4;
             // 
+            // createAgainButton
+            // 
+            createAgainButton.Location = new Point(83, 515);
+            createAgainButton.Name = "createAgainButton";
+            createAgainButton.Size = new Size(113, 23);
+            createAgainButton.TabIndex = 21;
+            createAgainButton.Text = "Create Another";
+            createAgainButton.UseVisualStyleBackColor = true;
+            createAgainButton.Click += createAgainButton_Click;
+            // 
             // CreateTransaction
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(454, 587);
+            Controls.Add(createAgainButton);
             Controls.Add(noteLabel);
             Controls.Add(noteTextBox);
             Controls.Add(TransactionDatePicker);
@@ -194,5 +206,6 @@
         private DateTimePicker TransactionDatePicker;
         private Label noteLabel;
         private TextBox noteTextBox;
+        private Button createAgainButton;
     }
 }
