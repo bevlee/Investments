@@ -29,5 +29,6 @@ An example of the generated pdf can be seen below:
 ![example_pdf](Deductions/resources/examplepdf.png)
 
 
-## Coming up:
-- store the source of a document within the app as a reference
+## Credits
+app logo derived from 
+<a href="https://www.flaticon.com/free-icons/cash" title="cash icons">Cash icons created by Smashicons - Flaticon</a>

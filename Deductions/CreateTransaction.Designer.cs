@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreateTransaction));
             createTransactionButton = new Button();
             TransactionValueLabel = new Label();
             TransactionValueTextBox = new TextBox();
@@ -184,6 +185,7 @@
             Controls.Add(TransactionValueLabel);
             Controls.Add(TransactionValueTextBox);
             Controls.Add(createTransactionButton);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "CreateTransaction";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "CreateTransaction";

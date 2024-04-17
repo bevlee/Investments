@@ -36,6 +36,7 @@ namespace Deductions
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(HomePage));
             AccountLabel = new Label();
             manageInvestmentsButton = new Button();
             accountComboBox = new ComboBox();
@@ -335,6 +336,7 @@ namespace Deductions
             Controls.Add(manageInvestmentsButton);
             Controls.Add(AccountLabel);
             Controls.Add(menuStrip1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = menuStrip1;
             Name = "HomePage";
             StartPosition = FormStartPosition.CenterScreen;

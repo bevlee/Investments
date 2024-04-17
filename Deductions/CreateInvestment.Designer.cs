@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreateInvestment));
             confirmCreateInvestment = new Button();
             Account_Label = new Label();
             InvestmentName_Textbox = new TextBox();
@@ -89,6 +90,7 @@
             Controls.Add(InvestmentName_Textbox);
             Controls.Add(Account_Label);
             Controls.Add(confirmCreateInvestment);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "CreateInvestment";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "CreateInvestment";
