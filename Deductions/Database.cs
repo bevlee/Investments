@@ -285,9 +285,6 @@ namespace Deductions
                     while (reader.Read())
                     {
                         accounts.Add(reader.GetString(0));
-                        //transaction = reader.GetString(0);
-
-                        //System.Diagnostics.Debug.WriteLine($"Hello, {name}!");
                     }
                 }
             }
@@ -314,32 +311,6 @@ namespace Deductions
             }
         }
 
-        internal static void CreateNewTransactions(Transaction transaction)
-        {   
-
-            using (SQLiteConnection conn = CreateConnection())
-            {
-
-                var createCommand = conn.CreateCommand();
-                createCommand.CommandText =
-                    @"
-                        INSERT INTO Transactions (Item, InvestmentName, Value, Date, LastModifiedDate, TransactionType, FinancialYear, Note, Source)
-                        VALUES (@Item, @investmentName, @value, @Date, @LastModifiedDate, @transactionType, @FinancialYear, @note, '');
-                    ";
-                createCommand.Parameters.AddWithValue("@Item", transaction.Item);
-                createCommand.Parameters.AddWithValue("@investmentName", transaction.getInvestmentName());
-                createCommand.Parameters.AddWithValue("@value", transaction.Amount);
-                createCommand.Parameters.AddWithValue("@Date", ((DateTimeOffset)transaction.Date).ToUnixTimeSeconds());
-                createCommand.Parameters.AddWithValue("@LastModifiedDate", ((DateTimeOffset)transaction.LastModifiedDate).ToUnixTimeSeconds());
-                createCommand.Parameters.AddWithValue("@transactionType", transaction.TransactionType);
-                createCommand.Parameters.AddWithValue("@note", transaction.Note);
-                createCommand.Parameters.AddWithValue("@FinancialYear", ToFinancialYear(transaction.Date));
-
-                createCommand.ExecuteNonQuery();
-
-                return;
-            }
-        }
         internal static void UpsertTransactions(List<Transaction> transactions)
         {
             using (SQLiteConnection conn = CreateConnection())
@@ -504,7 +475,17 @@ namespace Deductions
                     WHERE InvestmentName=@investmentName;
                 ";
                 createCommand.Parameters.AddWithValue("@investmentName", investmentName);
-                int changed = createCommand.ExecuteNonQuery();               
+                int changed = createCommand.ExecuteNonQuery();     
+                if (changed > 0 )
+                {
+                    // delete the transactions related to the investment
+                    createCommand.CommandText =
+                    @"
+                        DELETE FROM Transactions
+                        WHERE InvestmentName=@investmentName;
+                    ";
+                    createCommand.ExecuteNonQuery();
+                }
 
                 return;
             }

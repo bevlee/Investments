@@ -30,7 +30,10 @@
         {
             ValueTuple<string, string> selectedTuple =
                   (ValueTuple<string, string>)investmentsListBox.SelectedItem;
-            DialogResult dialogResult = MessageBox.Show($"Are you sure you wish to delete Investment: {selectedTuple.Item1}", "Delete Investment", MessageBoxButtons.YesNo);
+            DialogResult dialogResult = MessageBox.Show(
+                $"Are you sure you wish to delete\n\n" +
+                $"Investment: {selectedTuple.Item1}\n\n" +
+                $"All the corresponding data associated with it will be deleted too!", "Delete Investment", MessageBoxButtons.YesNo);
             if (dialogResult == DialogResult.Yes)
             {
                 Database.DeleteInvestment(selectedTuple.Item1);
