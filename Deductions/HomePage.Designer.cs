@@ -187,7 +187,7 @@ namespace Deductions
             DeleteButton.BackColor = Color.DarkKhaki;
             DeleteButton.Location = new Point(1086, 174);
             DeleteButton.Name = "DeleteButton";
-            DeleteButton.Size = new Size(133, 49);
+            DeleteButton.Size = new Size(141, 49);
             DeleteButton.TabIndex = 12;
             DeleteButton.Text = "Deleted Selected Rows";
             DeleteButton.UseVisualStyleBackColor = false;
@@ -306,7 +306,7 @@ namespace Deductions
             resetDatesButton.Name = "resetDatesButton";
             resetDatesButton.Size = new Size(75, 23);
             resetDatesButton.TabIndex = 21;
-            resetDatesButton.Text = "reset Dates";
+            resetDatesButton.Text = "Reset Dates";
             resetDatesButton.UseVisualStyleBackColor = true;
             resetDatesButton.Click += resetDatesButton_Click;
             // 
