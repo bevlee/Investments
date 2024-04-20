@@ -6,7 +6,7 @@
         private string _investmentName;
         public DateTime Date { get; }
         public string Item { get; }
-        public decimal Amount { get; set; }
+        public decimal Amount { get; }
         public string TransactionType { get; }
         public int FinancialYear { get; }
         public DateTime LastModifiedDate { get; }

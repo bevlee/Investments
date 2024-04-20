@@ -1,5 +1,4 @@
 ﻿using System.Data.SQLite;
-using System.Transactions;
 
 namespace Deductions
 {
@@ -79,7 +78,7 @@ namespace Deductions
         }
         public static DateTime getOldestTransaction(string investmentName)
         {
-            DateTime oldestTransactionDate = DateTime.MinValue;
+            DateTime oldestTransactionDate = DateTime.UnixEpoch;
 
             using (SQLiteConnection conn = CreateConnection())
             {

@@ -1,4 +1,4 @@
-Date,TransactionType,Amount,Category,Note
+Date,TransactionType,Amount,Item,Note
 27/03/24,Expense,870,Interest,
 12/02/24,Expense,958.24,Interest,
 12/01/24,Expense,1101.55,Interest,

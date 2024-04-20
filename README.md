@@ -18,7 +18,7 @@ Transactions can be entered manually or by importing from a csv file (see below)
 
 The csv MUST be in the following format(example file provided as template.csv):
 
-Date, TransactionType, Amount, Category, Note (optional)
+Date, TransactionType, Amount, Item, Note (optional)
 
 
 

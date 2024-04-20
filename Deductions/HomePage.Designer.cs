@@ -304,7 +304,7 @@ namespace Deductions
             // 
             resetDatesButton.Location = new Point(1042, 90);
             resetDatesButton.Name = "resetDatesButton";
-            resetDatesButton.Size = new Size(75, 23);
+            resetDatesButton.Size = new Size(82, 23);
             resetDatesButton.TabIndex = 21;
             resetDatesButton.Text = "Reset Dates";
             resetDatesButton.UseVisualStyleBackColor = true;
